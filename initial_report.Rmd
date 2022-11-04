@@ -10,6 +10,7 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(viridis)
+library(scales) # fto display percentages
 
 # Source R scripts
 r_scripts <- list.files(here::here("R/"), full.names = TRUE)
@@ -17,7 +18,27 @@ purrr::walk(r_scripts, source)
 
 # Read data
 raw <- readr::read_tsv("data/ECAW_raw_data.tsv")
+# remove surveys where someone opened it, but didn't respond to any questions
+raw <- raw %>% filter(progress!=0)
+# number of respondents
+nResponse <- raw %>% nrow()
+
+# Filter for complete responses (I'm am maintaining the variable name "raw" only because it is used throughout the rest of the code)
+raw <- raw %>% filter(finished)
+#number of completed surveys
+nResponseComplete <- raw %>% nrow()
+
+invited <- 1148 # Number provided from Kyara at ALSPAC
+bounced <- 54 # Number provided from Kyara at ALSPAC
+received <- invited - bounced
 ```
+
+# Response rate
+
+We invited the ALSPAC mailing list to participate, which included `r invited` email addresses, of which `r bounced` bounced, leaving `r received` emails. The survey was completed `r nResponseComplete` times and partially completed `r nResponse - nResponseComplete` times. This gives a response rate for completed surveys of `r percent(nResponseComplete / received)` and a response rate for any questions `r percent(nResponse / received)`.
+
+The median time taken for complete survey responses was `r (median(raw$duration_in_seconds) / 60) %>% round(1)` minutes (IQR: `r (quantile(raw$duration_in_seconds, .25) / 60) %>% round(1)` - `r (quantile(raw$duration_in_seconds, .75) / 60) %>% round(1)`)
+
 
 # Reproducibility and trustworthiness
 
@@ -142,7 +163,87 @@ ecaw_likert_data %>%
     legend.text = element_text(size = 19))
 ```
 
-# ALSPAC
+# Current practices
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width = 10}
+method_data <-
+  raw %>% 
+    select(starts_with("method_")) %>% 
+    pivot_longer(
+      cols = everything(),
+      names_to = "variable",
+      values_to = "scale",
+    ) %>%
+    separate(variable, into = c("name_prefix", "type")) %>% 
+    group_by(type) %>% 
+    count(scale) %>% 
+  ungroup() %>% 
+    replace_na(list(scale = "Missing")) %>% 
+    mutate(
+      scale = factor(scale, levels = c(
+          "Never or almost never",
+          "Sometimes",
+          "About half the time",
+          "Most of the time",
+          "Always or almost always",
+          "Missing",
+          "I don't understand the question")
+            ),
+      type = case_when(
+        type == "blind" ~ "Blind the data analyst",
+        type == "confirmatory" ~ "Contain confirmatory analysis",
+        type == "exploratory" ~ "Contain exploratory analysis",
+        type == "preregistered" ~ "Are preregistered",
+        type == "script" ~ "Share analysis scripts",
+      )
+      ) %>% 
+  group_by(type) %>%
+  tidyr::complete(scale, fill = list(n = 0)) %>% 
+  mutate(
+    percentage = n / sum(n)
+  ) %>% 
+  ungroup()
+
+# method_missing_data <-
+#   method_data %>% 
+#   filter(scale %in% c("Missing", "I don't understand the question")) %>% 
+#   mutate(
+#     scale = case_when(
+#       scale == "I don't understand the question" ~ "Don't understand",
+#       scale == "Missing" ~ "Missing"),
+#     text = paste0(scale, ": ", n)
+#     ) %>% 
+#   group_by(type) %>% 
+#   summarise(text = stringr::str_c(text, collapse = "\n"))
+
+method_data %>% 
+  # filter(scale %ni% c("Missing", "I don't understand the question")) %>% 
+  ggplot() +
+  aes(
+    x = percentage,
+    y = type,
+    fill = scale
+  ) +
+  geom_bar(position = "stack", stat = "identity") +
+  scale_fill_viridis(option = "A", discrete = TRUE) +
+  scale_x_continuous(
+    limits = c(0, 1),
+    labels = scales::label_percent()
+  ) +
+  labs(
+    title = "The studies using preexisting observational data that I am involved in...",
+    x = "Percentage",
+    fill = "Response levels"
+  ) +
+  theme(
+    panel.background = element_blank(),
+    panel.grid = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.title.y = element_blank()
+  )
+```  
+
+# ALSPAC and ECAWs
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width = 22, fig.height = 8}
 alspac_likert_data <-
@@ -211,86 +312,6 @@ alspac_likert_data %>%
     legend.key.size = unit(0.8, 'cm'),
     legend.text = element_text(size = 19))
 ```
-
-# Current methods
-
-```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width = 10}
-method_data <-
-  raw %>% 
-    select(starts_with("method_")) %>% 
-    pivot_longer(
-      cols = everything(),
-      names_to = "variable",
-      values_to = "scale",
-    ) %>%
-    separate(variable, into = c("name_prefix", "type")) %>% 
-    group_by(type) %>% 
-    count(scale) %>% 
-  ungroup() %>% 
-    replace_na(list(scale = "Missing")) %>% 
-    mutate(
-      scale = factor(scale, levels = c(
-          "Never or almost never",
-          "Sometimes",
-          "About half the time",
-          "Most of the time",
-          "Always or almost always",
-          "Missing",
-          "I don't understand the question")
-            ),
-      type = case_when(
-        type == "blind" ~ "Blind analysis",
-        type == "confirmatory" ~ "Confirmatory analysis",
-        type == "exploratory" ~ "Exploratory analysis",
-        type == "preregistered" ~ "Preregistration",
-        type == "script" ~ "Analysis script",
-      )
-      ) %>% 
-  group_by(type) %>%
-  tidyr::complete(scale, fill = list(n = 0)) %>% 
-  mutate(
-    percentage = n / sum(n)
-  ) %>% 
-  ungroup()
-
-# method_missing_data <-
-#   method_data %>% 
-#   filter(scale %in% c("Missing", "I don't understand the question")) %>% 
-#   mutate(
-#     scale = case_when(
-#       scale == "I don't understand the question" ~ "Don't understand",
-#       scale == "Missing" ~ "Missing"),
-#     text = paste0(scale, ": ", n)
-#     ) %>% 
-#   group_by(type) %>% 
-#   summarise(text = stringr::str_c(text, collapse = "\n"))
-
-method_data %>% 
-  # filter(scale %ni% c("Missing", "I don't understand the question")) %>% 
-  ggplot() +
-  aes(
-    x = percentage,
-    y = type,
-    fill = scale
-  ) +
-  geom_bar(position = "stack", stat = "identity") +
-  scale_fill_viridis(option = "A", discrete = TRUE) +
-  scale_x_continuous(
-    limits = c(0, 1),
-    labels = scales::label_percent()
-  ) +
-  labs(
-    title = "The studies using preexisting observational data that I am involved in...",
-    x = "Percentage",
-    fill = "Response levels"
-  ) +
-  theme(
-    panel.background = element_blank(),
-    panel.grid = element_blank(),
-    axis.ticks.y = element_blank(),
-    axis.title.y = element_blank()
-  )
-```  
 
 # How many respondents are open to  be interviewed?
 
