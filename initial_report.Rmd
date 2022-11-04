@@ -1,0 +1,423 @@
+---
+title: "Initial report"
+output: html_document
+date: '`r Sys.Date()`'
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(viridis)
+
+# Source R scripts
+r_scripts <- list.files(here::here("R/"), full.names = TRUE)
+purrr::walk(r_scripts, source)
+
+# Read data
+raw <- readr::read_tsv("data/ECAW_raw_data.tsv")
+```
+
+# Reproducibility and trustworthiness
+
+The reproducible and trustworthiness ratings with the current system.
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width = 20}
+typically_likert_data <-
+  raw %>% 
+    select(starts_with("typically_")) %>% 
+    pivot_longer(
+      cols = everything(),
+      names_to = "variable",
+      values_to = "scale",
+    ) %>%
+    separate(variable, into = c("time", "type")) %>% 
+    group_by(type) %>% 
+    count(scale) %>% 
+  ungroup() %>% 
+    replace_na(list(scale = "Missing")) %>% 
+    mutate(
+      scale = factor(scale, levels = c(
+            "Strongly disagree",
+            "Somewhat disagree",
+            "Neither agree nor disagree",
+            "Somewhat agree",
+            "Strongly agree",
+            "Missing",
+            "I don't understand the question")
+            ),
+      type = str_to_title(type)
+      ) %>% 
+  group_by(type) %>%
+  tidyr::complete(scale, fill = list(n = 0)) %>% 
+  ungroup()
+
+typically_missing_data <-
+  typically_likert_data %>% 
+  filter(scale %in% c("Missing", "I don't understand the question")) %>% 
+  mutate(
+    scale = case_when(
+      scale == "I don't understand the question" ~ "Don't understand",
+      scale == "Missing" ~ "Missing"),
+    text = paste0(scale, ": ", n)
+    ) %>% 
+  group_by(type) %>% 
+  summarise(text = stringr::str_c(text, collapse = "\n"))
+
+typically_likert_data %>% 
+  likert_plot_odd(.,
+                  title = "Typically, studies that analyze preexisting\nobservational datasets, are ...",
+                  questions = type,
+                  levels = scale,
+                  n = n,
+                  levels_to_drop = c("Missing", "I don't understand the question"),
+                  positive_side = "lower",
+                  text_push = 0.05) +
+  geom_text(typically_missing_data, mapping = aes(x = type, y = 1.15, label = text), size = 8) +
+  theme(
+    plot.margin = margin(t = 10, r = 220, b = 10, l = 0),
+    legend.key.size = unit(0.8, 'cm'),
+    legend.text = element_text(size = 19)
+    )
+```
+
+The reproducible and trustworthiness ratings of ECAW compared to the current system.
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width = 20}
+ecaw_likert_data <-
+  raw %>% 
+    select(starts_with("ecaw_")) %>% 
+    pivot_longer(
+      cols = everything(),
+      names_to = "variable",
+      values_to = "scale",
+    ) %>%
+    separate(variable, into = c("time", "type")) %>% 
+    group_by(type) %>% 
+    count(scale) %>% 
+  ungroup() %>% 
+    replace_na(list(scale = "Missing")) %>% 
+    mutate(
+      scale = factor(scale, levels = c(
+          "Much less",
+          "Somewhat less",
+          "About the same",
+          "Somewhat more",
+          "Much more",
+          "Missing",
+          "I don't understand the question")
+            ),
+      type = str_to_title(type)
+      ) %>% 
+  group_by(type) %>%
+  tidyr::complete(scale, fill = list(n = 0)) %>% 
+  ungroup()
+
+ecaw_missing_data <-
+  ecaw_likert_data %>% 
+  filter(scale %in% c("Missing", "I don't understand the question")) %>% 
+  mutate(
+    scale = case_when(
+      scale == "I don't understand the question" ~ "Don't understand",
+      scale == "Missing" ~ "Missing"),
+    text = paste0(scale, ": ", n)
+    ) %>% 
+  group_by(type) %>% 
+  summarise(text = stringr::str_c(text, collapse = "\n"))
+
+ecaw_likert_data %>% 
+  likert_plot_odd(.,
+                  title = "Compared to a typical study using preexisting observational data,\na study using an ECAW would be...",
+                  questions = type,
+                  levels = scale,
+                  n = n,
+                  levels_to_drop = c("Missing", "I don't understand the question"),
+                  positive_side = "lower",
+                  text_push = 0.05) +
+  geom_text(typically_missing_data, mapping = aes(x = type, y = 1.15, label = text), size = 8) +
+  theme(
+    plot.margin = margin(t = 10, r = 220, b = 10, l = 0),
+    legend.key.size = unit(0.8, 'cm'),
+    legend.text = element_text(size = 19))
+```
+
+# ALSPAC
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width = 22, fig.height = 8}
+alspac_likert_data <-
+  raw %>% 
+    select(starts_with("likert_")) %>% 
+    pivot_longer(
+      cols = everything(),
+      names_to = "type",
+      values_to = "scale",
+    ) %>%
+    mutate(
+      type = str_remove(type, "^[^_]*_")
+    ) %>% 
+    group_by(type) %>% 
+    count(scale) %>% 
+  ungroup() %>% 
+    replace_na(list(scale = "Missing")) %>% 
+    mutate(
+      scale = factor(scale, levels = c(
+          "Strongly disagree",
+          "Somewhat disagree",
+          "Neither agree nor disagree",
+          "Somewhat agree",
+          "Strongly agree",
+          "Missing",
+          "I don't understand the question",
+          "Unsure")
+            ),
+      type = case_when(
+        type == "study" ~ "ALSPAC should\nrun a study",
+        type == "prefer_ecaw" ~ "I would\nprefer ECAW",
+        type == "opt_in" ~ "I would opt in",
+        type == "less_willing" ~ "I would be\nless willing to use",
+      )
+      ) %>% 
+  group_by(type) %>%
+  tidyr::complete(scale, fill = list(n = 0)) %>% 
+  ungroup()
+
+alspac_missing_data <-
+  alspac_likert_data %>% 
+  filter(scale %in% c("Missing", "I don't understand the question", "Unsure")) %>% 
+  mutate(
+    scale = case_when(
+      scale == "I don't understand the question" ~ "Don't understand",
+      scale == "Missing" ~ "Missing",
+      scale == "Unsure" ~ "Unsure"),
+    text = paste0(scale, ": ", n)
+    ) %>% 
+  group_by(type) %>% 
+  summarise(text = stringr::str_c(text, collapse = "\n"))
+
+alspac_likert_data %>% 
+  likert_plot_odd(.,
+                  title = "Thinking about a study you may run with ALSPAC data ...",
+                  questions = type,
+                  levels = scale,
+                  n = n,
+                  levels_to_drop = c("Missing", "I don't understand the question", "Unsure"),
+                  positive_side = "lower",
+                  text_push = 0.08,
+                  limits = c(-1, 1)) +
+  geom_text(alspac_missing_data, mapping = aes(x = type, y = 1.2, label = text), size = 8) +
+  theme(
+    plot.margin = margin(t = 10, r = 220, b = 10, l = 0),
+    legend.key.size = unit(0.8, 'cm'),
+    legend.text = element_text(size = 19))
+```
+
+# Current methods
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width = 10}
+method_data <-
+  raw %>% 
+    select(starts_with("method_")) %>% 
+    pivot_longer(
+      cols = everything(),
+      names_to = "variable",
+      values_to = "scale",
+    ) %>%
+    separate(variable, into = c("name_prefix", "type")) %>% 
+    group_by(type) %>% 
+    count(scale) %>% 
+  ungroup() %>% 
+    replace_na(list(scale = "Missing")) %>% 
+    mutate(
+      scale = factor(scale, levels = c(
+          "Never or almost never",
+          "Sometimes",
+          "About half the time",
+          "Most of the time",
+          "Always or almost always",
+          "Missing",
+          "I don't understand the question")
+            ),
+      type = case_when(
+        type == "blind" ~ "Blind analysis",
+        type == "confirmatory" ~ "Confirmatory analysis",
+        type == "exploratory" ~ "Exploratory analysis",
+        type == "preregistered" ~ "Preregistration",
+        type == "script" ~ "Analysis script",
+      )
+      ) %>% 
+  group_by(type) %>%
+  tidyr::complete(scale, fill = list(n = 0)) %>% 
+  mutate(
+    percentage = n / sum(n)
+  ) %>% 
+  ungroup()
+
+# method_missing_data <-
+#   method_data %>% 
+#   filter(scale %in% c("Missing", "I don't understand the question")) %>% 
+#   mutate(
+#     scale = case_when(
+#       scale == "I don't understand the question" ~ "Don't understand",
+#       scale == "Missing" ~ "Missing"),
+#     text = paste0(scale, ": ", n)
+#     ) %>% 
+#   group_by(type) %>% 
+#   summarise(text = stringr::str_c(text, collapse = "\n"))
+
+method_data %>% 
+  # filter(scale %ni% c("Missing", "I don't understand the question")) %>% 
+  ggplot() +
+  aes(
+    x = percentage,
+    y = type,
+    fill = scale
+  ) +
+  geom_bar(position = "stack", stat = "identity") +
+  scale_fill_viridis(option = "A", discrete = TRUE) +
+  scale_x_continuous(
+    limits = c(0, 1),
+    labels = scales::label_percent()
+  ) +
+  labs(
+    title = "The studies using preexisting observational data that I am involved in...",
+    x = "Percentage",
+    fill = "Response levels"
+  ) +
+  theme(
+    panel.background = element_blank(),
+    panel.grid = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.title.y = element_blank()
+  )
+```  
+
+# How many respondents are open to  be interviewed?
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 8}
+raw %>% 
+  replace_na(list(contact = "Missing")) %>% 
+  count(contact) %>% 
+  mutate(
+    contact = case_when(
+      str_detect(contact, "Yes.") ~ "Yes",
+      TRUE ~ contact),
+    contact = factor(contact, levels = c("Yes", "No", "Missing")),
+    sum_n = sum(n),
+    percentage = n / sum_n,
+    text_label = paste0(n, "/", sum_n)
+  ) %>%
+  ggplot() +
+  aes(
+    x = contact,
+    y = percentage
+  ) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = text_label), size = 7, vjust = -1) +
+  scale_y_continuous(expand = c(0, 0), labels = scales::label_percent(), limits = c(0, 0.55)) +
+  labs(
+    x = "May the research team contact you about potential focus groups?",
+    y = "Percentage"
+  ) +
+  theme(
+    panel.background = element_blank(),
+    panel.grid = element_blank(),
+    axis.line = element_line(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 15)
+  )
+```
+
+# Concerned with rigour and reproducibility on the field
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, , fig.width = 20, fig.height = 8}
+concerned_data <-
+  raw %>% 
+  replace_na(list(concerned = "missing")) %>%
+  count(concerned) %>% 
+  mutate(
+    concerned = tolower(concerned),
+    concerned = factor(concerned, levels = c(
+      "very much less concerned",
+      "less concerned",
+      "somewhat less concerned",
+      "as concerned as a typical researcher in my field",
+      "somewhat more concerned",
+      "more concerned",
+      "very much more concerned",
+      "missing")
+      )
+  ) %>%
+  tidyr::complete(concerned, fill = list(n = 0)) %>% 
+  mutate(
+    percentage = n / sum(n)
+  ) %>% 
+  ungroup() %>% 
+  # Hacky need to fix later
+  mutate(question = rep("", 8))
+
+concerned_missing_data <-
+  concerned_data %>% 
+  filter(concerned == "missing") %>% 
+  summarise(text = paste0(concerned, ": ", n))
+
+concerned_data %>% 
+  likert_plot_odd(.,
+                  title = "Compared to what you think of as a typical researcher\nwho uses preexisting observational data in your field,\nhow concerned are you with research\n trustworthiness, bias, rigour, and reproducibility.",
+                  questions = question,
+                  levels = concerned,
+                  n = n,
+                  levels_to_drop = "missing",
+                  positive_side = "lower",
+                  text_push = 0.08,
+                  limits = c(-0.5, 1),
+                  legend_row = 3) +
+  geom_text(concerned_missing_data, mapping = aes(x = 1, y = 1.1, label = text), size = 8) +
+  theme(
+    plot.margin = margin(t = 10, r = 220, b = 5, l = 50),
+    legend.key.size = unit(0.8, 'cm'),
+    legend.text = element_text(size = 19))
+```
+
+# Number of studies published
+
+The median of the number of studies published is `r median(raw$n_studies, na.rm = T)` with an IQR of `r IQR(raw$n_studies, na.rm = T)`. The maximum number of studies published is `r max(raw$n_studies, na.rm = T)` while the minimum is `r min(raw$n_studies, na.rm = T)`. There were `r raw %>% filter(is.na(n_studies)) %>% nrow(.)` missing responses to this question.
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+raw %>% 
+  select(n_studies) %>% 
+  filter(!is.na(n_studies)) %>%
+  ggplot() +
+  aes(
+    x = n_studies
+  ) +
+  geom_histogram() +
+  labs(
+    x = "The number of studies published",
+    y = "Count"
+  ) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme(
+    panel.background = element_blank(),
+    panel.grid = element_blank(),
+    axis.line = element_line()
+  )
+```
+
+# Software used to analyse the data
+
+There were `r raw %>% filter(is.na(programming_language)) %>% nrow(.)` missing responses to this question. The frequency of responses can be found below. Keep in mind that one respondent could choose multiple software languages.
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+raw %>% 
+  select(programming_language) %>% 
+  filter(!is.na(programming_language)) %>% 
+  separate_rows(programming_language, sep = ",") %>% 
+  count(programming_language) %>% 
+  rename(
+    `Programming language` = programming_language,
+    N = n) %>% 
+  arrange(desc(N)) %>% 
+  kableExtra::kbl()
+```
+
