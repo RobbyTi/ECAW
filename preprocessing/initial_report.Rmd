@@ -5,10 +5,14 @@ date: '`r Sys.Date()`'
 editor_options: 
   chunk_output_type: console
 ---
-
+TODO: subset by concerned number of studies and current methods
 ```{r setup, include=FALSE}
+# General rmarkdown rendering setting
 knitr::opts_chunk$set(echo = TRUE)
+
+# Loading used packages 
 library(tidyverse)
+library(likert)
 library(viridis)
 library(scales) # fto display percentages
 
@@ -45,6 +49,7 @@ The median time taken for complete survey responses was `r (median(raw$duration_
 The reproducible and trustworthiness ratings with the current system.
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width = 20}
+# Prepearing data for Likert-scale plotting
 typically_likert_data <-
   raw %>% 
     select(starts_with("typically_")) %>% 
@@ -74,6 +79,7 @@ typically_likert_data <-
   tidyr::complete(scale, fill = list(n = 0)) %>% 
   ungroup()
 
+# Creating text labels for reporting the count of non-likert response levels on the Likert-scale plot 
 typically_missing_data <-
   typically_likert_data %>% 
   filter(scale %in% c("Missing", "I don't understand the question")) %>% 
@@ -405,6 +411,7 @@ concerned_data %>%
 The median of the number of studies published is `r median(raw$n_studies, na.rm = T)` with an IQR of `r IQR(raw$n_studies, na.rm = T)`. The maximum number of studies published is `r max(raw$n_studies, na.rm = T)` while the minimum is `r min(raw$n_studies, na.rm = T)`. There were `r raw %>% filter(is.na(n_studies)) %>% nrow(.)` missing responses to this question.
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# Separate zero and bins of 5
 raw %>% 
   select(n_studies) %>% 
   filter(!is.na(n_studies)) %>%
@@ -412,12 +419,15 @@ raw %>%
   aes(
     x = n_studies
   ) +
-  geom_histogram() +
+  geom_histogram(binwidth = 3) +
   labs(
     x = "The number of studies published",
     y = "Count"
   ) +
   scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(
+    # breaks = seq(0, 100, by = 3)
+    )
   theme(
     panel.background = element_blank(),
     panel.grid = element_blank(),

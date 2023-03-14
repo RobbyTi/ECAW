@@ -1,0 +1,83 @@
+---
+title: "Results exploration"
+author: "Marton Kovacs"
+date: "`r Sys.Date()`"
+output: html_document
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("papaja")
+library(tidyverse)
+library(here)
+library(kableExtra)
+library(gt)
+library(patchwork)
+library(likert)
+library(viridis)
+library(shiny)
+# r_refs("references.bib")
+
+# Source R scripts
+r_scripts <- list.files(here::here("R/"), full.names = TRUE)
+purrr::walk(r_scripts, source)
+
+# Loading data
+processed <- read_csv(here("data/processed/ecaw_processed_data.csv"))
+```
+
+what is this document...
+
+# Subset
+
+Subset data for all the results.
+
+```{r, echo=FALSE}
+inputPanel(
+  sliderInput("n_studies", label = "Number of studies using ALSPAC:",
+               min = min(processed$n_studies, na.rm = T), max = max(processed$n_studies, na.rm = T), value = max(processed$n_studies, na.rm = T), step = 1),
+  radioButtons("methods", label = "Used the following methods:", choices = c("Blind", "Script", "Confirmatory", "Exploratory"), selected = NULL, inline = FALSE),
+    radioButtons("concerned", label = "Concerned with rigour and reproducibility:", choices = c("Negative", "Neutral", "Support"), selected = NULL, inline = FALSE)
+)
+
+# Filter data
+filtered_data <- reactive({
+  processed %>% 
+    filter(
+      n_studies == input$n_studies
+    )
+  })
+```
+
+# Reproducibility and trustworthiness
+
+The reproducible and trustworthiness ratings with the current ALSPAC system.
+
+```{r}
+# Prepare plot data
+typically_plot_data <- 
+  processed %>%
+  select(contains("typically_")) %>% 
+  mutate(
+    across(
+      .fns = ~ factor(., levels =   c(
+    "Strongly disagree",
+    "Somewhat disagree",
+    "Neither agree nor disagree",
+    "Somewhat agree",
+    "Strongly agree"))
+    )) %>% 
+  rename(
+    Reproducible = typically_reproducible,
+    Trustworthy = typically_trustworthy
+  )
+
+# Create likert package data not including the missing values
+typically_plot_data <- likert(typically_plot_data)
+
+# Create figure
+typically_plot <- 
+  plot(typically_plot_data)
+```
+
