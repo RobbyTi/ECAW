@@ -97,6 +97,7 @@ editor_options:
 ---
 
 ```{r setup, include = FALSE, warning=FALSE, message=FALSE}
+# Load pacakges
 library("papaja")
 library(tidyverse)
 library(here)
@@ -149,7 +150,7 @@ The survey (supplementary material B) contained 6 blocks. Block 1 assessed wheth
 
 ```{r include=FALSE}
 # List of used programming languages and their counts text
-language_table <-
+language_text <-
   processed %>% 
   rename(lang = programming_language) %>% 
   separate_rows(lang, sep = ",") %>% 
@@ -176,9 +177,9 @@ concerned <- support_percentage(
   )
 ```
 
-We invited the ALSPAC mailing list to participate, which included 1148 email addresses. 54 emails bounced, leaving 1094 emails that went through. The survey was completed `r nrow(processed)` times and partially completed `r nrow(filter(processed, has_missing)) ` times, leading to a response rate of `r round(nrow(processed) / 1094 * 100)`% for completed surveys and `r round(nrow(filter(processed, has_missing)) / 1094 * 100)`% for incomplete surveys.[^1] The results presented in this manuscript only include completed surveys.[^2] The median time taken for complete survey responses was `r median(processed$duration_in_mins)` minutes (IQR: `r round(quantile(processed$duration_in_mins, .75), 1)` - `r round(quantile(processed$duration_in_mins, .25), 1)`).
+We invited the ALSPAC mailing list to participate, which included 1148 email addresses. 54 emails bounced, leaving 1094 emails that went through. The survey was completed `r nrow(processed)` times and partially completed `r nrow(dplyr::filter(processed, has_missing)) ` times, leading to a response rate of `r round(nrow(processed) / 1094 * 100)`% for completed surveys and `r round(nrow(filter(processed, has_missing)) / 1094 * 100)`% for incomplete surveys.[^1] The results presented in this manuscript only include completed surveys.[^2] The median time taken for complete survey responses was `r median(processed$duration_in_mins)` minutes (IQR: `r round(quantile(processed$duration_in_mins, .75, na.rm = TRUE), 1)` - `r round(quantile(processed$duration_in_mins, .25, na.rm = T), 1)`).
 
-Respondents published a median of `r median(processed$n_studies)` (IQR `r round(quantile(processed$n_studies, .75), 1)` - `r round(quantile(processed$n_studies, .25), 1)`) studies using preexisting observational data (Figure S1). They reported using the programming languages `r language_text` (Table S1). `r pull(filter(concerned, support == "positive"), percentage)`% of participants reported being more concerned, versus `r pull(filter(concerned, support == "negative"), percentage)`% who reported being less concerned, with research trustworthiness, bias, rigour, and reproducibility compared to what they think of as a typical research who uses preexisting observational data (Figure #).  
+Respondents published a median of `r median(processed$n_studies)` (IQR `r round(quantile(processed$n_studies, .75, na.rm = TRUE), 1)` - `r round(quantile(processed$n_studies, .25, na.rm = TRUE), 1)`) studies using preexisting observational data (Figure S1). They reported using the programming languages `r language_text` (Table S1). `r pull(filter(concerned, support == "positive"), percentage)`% of participants reported being more concerned, versus `r pull(filter(concerned, support == "negative"), percentage)`% who reported being less concerned, with research trustworthiness, bias, rigour, and reproducibility compared to what they think of as a typical research who uses preexisting observational data (Figure #).  
 
 ```{r, include=FALSE}
 # Concerned figure data preparation
@@ -186,6 +187,7 @@ concerned_plot_data <-
   processed %>% 
   select(concerned) %>% 
   mutate(
+    concerned = tolower(concerned),
     concerned = factor(concerned, levels = c(
       "very much less concerned",
       "less concerned",
@@ -538,7 +540,7 @@ method_plot <-
 method_plot
 ```
 
-```{r include=FALSE}
+```{r include=FALSE, warning=FALSE, message=FALSE}
 willing <- support_percentage(
   processed,
   alspac_less_willing,
@@ -602,7 +604,7 @@ prefer <- support_percentage(
 
 `r pull(filter(willing, support == "positive"), percentage)`% of respondents agreed (versus `r pull(filter(willing, support == "negative"), percentage)`% who disagreed) that they would be less willing to use ALSPAC data if they were required to use an ECAW (Figure 3). `r pull(filter(opt, support == "positive"), percentage)`% agreed (`r pull(filter(opt, support == "negative"), percentage)`% disagreed) that they would opt-in if ALSPAC ran a study on ECAWs. `r pull(filter(study, support == "positive"), percentage)`% agreed (`r pull(filter(study, support == "negative"), percentage)`% disagreed) that ALSPAC should run a study on ECAWs. `r pull(filter(prefer, support == "positive"), percentage)`% agreed (`r pull(filter(prefer, support == "negative"), percentage)`% disagreed) that they would prefer using an ECAW than using typical preregistration.
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 # Check if there is any missing and don't understand responses separately
 alspac_missing_text <-
   processed %>% 

@@ -76,8 +76,8 @@ raw <-
             -suggestions,
             -comments
             ),
-          .fns = is.na) ~ 1L,
-        TRUE ~ 0L
+          .fns = is.na) ~ TRUE,
+        TRUE ~ FALSE
         )
       )
 ```
