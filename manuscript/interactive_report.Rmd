@@ -28,9 +28,7 @@ purrr::walk(r_scripts, source)
 processed <- read_csv(here("data/processed/ecaw_processed_data.csv"))
 ```
 
-what is this document...
-
-# Subset
+# Settings
 
 Subset data for all the results.
 
@@ -106,6 +104,8 @@ filtered_data <- reactive({
 shiny::renderText({nrow(filtered_data())})
 ```
 
+# Results from the manuscript
+
 ```{r echo=FALSE, warning=FALSE}
 # Create typically trustworthy and reproducible plot
 # Prepare plot data
@@ -173,15 +173,153 @@ ecaw_plot_data <- reactive({
 
 # Create figure
 ecaw_plot <- reactive({
-  plot(ecaw_plot_data, digits = 1, ordered = FALSE, legend.position = "right") +
+  plot(ecaw_plot_data(), digits = 1, ordered = FALSE, legend.position = "right") +
   labs(title = "Compared to a typical study using preexisting observational data, a study using an ECAW would be...")
 })
 
 # Join the two plots together to make one figure
-renderPlot({ typically_plot + ecaw_plot + plot_layout(ncol = 1, nrow = 2) })
+renderPlot({ typically_plot() + ecaw_plot() + plot_layout(ncol = 1, nrow = 2) })
 ```
 
-```{r}
+---
+
+```{r echo=FALSE}
+# Used methods figures
+method_plot_data <- reactive({
+  filtered_data() %>% 
+    select(starts_with("method_")) %>% 
+    pivot_longer(
+      cols = everything(),
+      names_to = "variable",
+      values_to = "scale",
+    ) %>%
+    separate(variable, into = c("name_prefix", "type")) %>% 
+    group_by(type) %>% 
+    count(scale) %>% 
+  ungroup() %>% 
+    replace_na(list(scale = "Missing")) %>% 
+    mutate(
+      scale = factor(scale, levels = c(
+          "Never or almost never",
+          "Sometimes",
+          "About half the time",
+          "Most of the time",
+          "Always or almost always",
+          "Missing",
+          "I don't understand the question")
+            ),
+      type = case_when(
+        type == "blind" ~ "Blind the data analyst",
+        type == "confirmatory" ~ "Contain confirmatory analysis",
+        type == "exploratory" ~ "Contain exploratory analysis",
+        type == "preregistered" ~ "Are preregistered",
+        type == "script" ~ "Share analysis scripts",
+      ),
+      type = factor(type, levels = c(
+        "Contain exploratory analysis",
+        "Contain confirmatory analysis",
+        "Blind the data analyst",
+        "Share analysis scripts",
+        "Are preregistered"
+      ))
+      ) %>% 
+  group_by(type) %>%
+  tidyr::complete(scale, fill = list(n = 0)) %>% 
+  mutate(
+    percentage = n / sum(n)
+  ) %>% 
+  ungroup()
+})
+
+renderPlot({
+method_plot_data() %>% 
+  # filter(scale %ni% c("Missing", "I don't understand the question")) %>% 
+  ggplot() +
+  aes(
+    x = percentage,
+    y = type,
+    fill = scale
+  ) +
+  geom_bar(position = "stack", stat = "identity") +
+  scale_x_continuous(
+    limits = c(0, 1),
+    labels = scales::label_percent()
+  ) +
+  scale_fill_viridis(option = "A", discrete = TRUE) +
+  labs(
+    x = "Percentage",
+    fill = "Response",
+    title = "The studies using preexisting observational data that I am involved in..."
+  ) +
+  papaja::theme_apa() +
+  theme(
+    axis.title.y = element_blank(),
+    legend.text = element_text(size = 12),
+    legend.title = element_blank()
+  ) 
+})
+```
+
+---
+
+```{r echo=FALSE}
+# Prepare plot data
+alspac_plot_data <- reactive({
+  filtered_data() %>%
+  select(contains("alspac_")) %>% 
+  # Transform not wanted response values to NA
+  # likert::likert drops NA values silently
+  # When var transformed to factor these values would be transformed to NA
+  # Automatically but I try to be explicit
+  mutate(
+    across(
+      everything(),
+      ~ case_when(
+        . %in% c("I don't understand the question", "Unsure") ~ NA_character_,
+        TRUE ~ .
+      )
+    )
+  ) %>% 
+  mutate(
+    across(
+      .fns = ~ factor(., levels = c(
+          "Strongly disagree",
+          "Somewhat disagree",
+          "Neither agree nor disagree",
+          "Somewhat agree",
+          "Strongly agree")
+          )
+      )
+    ) %>% 
+  rename(
+    `If ALSPAC required that I\nuse an ECAW, I would be less willing to\nuse their data in my research` = alspac_less_willing,
+    `If ALSPAC ran a study\non ECAWs, I would opt-in.` = alspac_opt_in,
+    `ALSPAC should run\na study on ECAWs.` = alspac_study,
+    `I would prefer using\nan ECAW than using typical preregistration` = alspac_prefer_ecaw
+  )
+})
+
+# Create likert package data not including the missing values
+alspac_plot_likert_data <- reactive({likert(alspac_plot_data())})
+
+# Create figure
+renderPlot({
+  plot(alspac_plot_likert_data(), digits = 1, ordered = TRUE, group.order = names(alspac_plot_data()), text.size = 6) +
+  labs(title = "Thinking about a study you may run with ALSPAC data (or one that you have recently run)...") +
+  theme(
+    title = element_text(size = 14),
+    axis.text.y = element_blank(),
+    axis.text.x = element_text(size = 15),
+    axis.title.x = element_text(size = 15),
+    legend.text = element_text(size = 12),
+    legend.title = element_blank()
+  )
+})
+```
+
+# Results from supplementary materials C
+
+```{r echo=FALSE}
 renderPlot({
 # Create histogram of the number of observational studies done
 filtered_data() %>% 
@@ -198,6 +336,71 @@ filtered_data() %>%
     title = "Approximately how many studies have you published using a preexisting observational dataset (e.g., the ALSPAC dataset)?"
   ) +
   papaja::theme_apa()
+})
+```
+
+---
+
+```{r echo=FALSE}
+# Programming languages table
+renderTable({
+filtered_data() %>% 
+  rename(lang = programming_language) %>% 
+  separate_rows(lang, sep = ",") %>% 
+  count(lang) %>% 
+  replace_na(list(lang = "Missing")) %>% 
+  # Removing irrelevant
+  filter(lang != "irrelevant") %>% 
+  ungroup() %>% 
+  mutate(
+    `Percentage of respondents` = round(n / sum(n) * 100, 0)
+  ) %>% 
+  arrange(desc(n)) %>% 
+  rename(
+    `Programming language` = lang,
+    `N` = n
+  )
+})
+```
+
+---
+
+```{r echo=FALSE}
+# Concerned figure data preparation
+concerned_plot_data <- reactive({
+  processed %>% 
+  select(concerned) %>% 
+  mutate(
+    concerned = tolower(concerned),
+    concerned = factor(concerned, levels = c(
+      "very much less concerned",
+      "less concerned",
+      "somewhat less concerned",
+      "as concerned as a typical researcher in my field",
+      "somewhat more concerned",
+      "more concerned",
+      "very much more concerned"
+      )
+    )
+  ) %>% 
+    filter(!is.na(concerned))
+})
+
+# Create likert package data not including the missing values
+concerned_likert_plot_data <- reactive({likert(concerned_plot_data())})
+
+# Create figure
+renderPlot({
+  plot(concerned_likert_plot_data(), digits = 1, text.size = 6, group.order = names(concerned_plot_data())) +
+  labs(title = "Compared to what you think of as a typical researcher who uses preexisting observational data in your field,\nhow concerned are you with research trustworthiness, bias, rigour, and reproducibility ...") +
+  theme(
+    title = element_text(size = 14),
+    axis.text.y = element_blank(),
+    axis.text.x = element_text(size = 15),
+    axis.title.x = element_text(size = 15),
+    legend.text = element_text(size = 10),
+    legend.title = element_blank()
+  )
 })
 ```
 
