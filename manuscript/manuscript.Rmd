@@ -105,6 +105,7 @@ library(gt)
 library(patchwork)
 # The developer version is needed
 library(likert)
+library(knitr)
 library(viridis)
 # r_refs("references.bib")
 ```
@@ -115,16 +116,26 @@ r_scripts <- list.files(here::here("R/"), full.names = TRUE)
 purrr::walk(r_scripts, source)
 ```
 
-```{r preprocessing}
+```{r preprocessing, include=FALSE}
 # loads source data, performs preprocessing, saves raw datafiles
-# source(here("preprocessing", "ecaw_source_raw_preprocessing.R"))
+xfun::Rscript_call(
+  rmarkdown::render,
+  list(
+    input = here::here("preprocessing", "ecaw_source_raw_preprocessing.Rmd"),
+    output_format = 'html_document')
+  )
 
 # loads raw data, performs preprocessing, saves processed datafiles
-# source(here("preprocessing", "ecaw_raw_processed_preprocessing.R"))
+xfun::Rscript_call(
+  rmarkdown::render,
+  list(
+    input = here::here("preprocessing", "ecaw_raw_processed_preprocessing.Rmd"),
+    output_format = 'html_document')
+  )
 ```
 
 ```{r loading_data}
-processed <- read_csv(here("data/processed/ecaw_processed_data.csv"))
+processed <- read_csv(here::here("data/processed/ecaw_processed_data.csv"))
 ```
 
 ```{r analysis_preferences}

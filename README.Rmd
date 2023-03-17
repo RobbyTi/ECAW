@@ -15,6 +15,8 @@ knitr::opts_chunk$set(
 
 The repository contains the data and the analysis for the research paper titled "A survey of registration practices among observational researchers using preexisting datasets". Other materials belonging to the project can be found on the project's OSF page at [https://osf.io/x2dpn/](https://osf.io/x2dpn/).
 
+__In order to replicate our results including the whole data preprocessing procedure with one click, please knit the `manuscript/manuscript.Rmd` file.__
+
 ## Folder structure
 
 The `data/` folder contains all the datafiles and the corresponding codebooks that are needed to reproduce the results of the project.
@@ -24,7 +26,7 @@ The `preprocessing/` folder contains all the data preprocessing files in rmarkdo
   * `ecaw_source_raw_preprocessing.Rmd` file contains the code necessary for the transformation of the source data (the datafile downloaded directly from Qualtrics as is) to the raw datafile (datafile with standard naming). We also made sure that the raw datafile does not contain any information that can be used to indetify any of the respondents.
   * `ecaw_raw_processed_preprocessing.Rmd` file contains the code that cleans the dataset and transforms is into tidy format ready for the analysis.
 
-The `manuscript/` folder contains the manuscript and supplementary materials documents with the analysis code embedded in them.
+The `manuscript/` folder contains the manuscript and supplementary materials documents with the analysis code embedded in them. The folder also includes the `interactive_report.Rmd` file, which includes an interactive document for reanalysing our results with different subsets of the data. To run the interactive document locally on your computer, click the _Run document_ button in Rstudio or run the `rmarkdown::run(here::here("manuscript/interactive_report.Rmd"))` function in your R console.
 
 The `R/` folder contains any custom R functions and their documentation.
 

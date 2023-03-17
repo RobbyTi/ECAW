@@ -147,11 +147,13 @@ concerned_missing_text <-
   ) %>% 
   pull(missing_text)
 
+concerned_plot_data <- filter(concerned_plot_data, !is.na(concerned))
+
 # Create likert package data not including the missing values
-concerned_plot_data <- likert(filter(concerned_plot_data, !is.na(concerned)))
+concerned_likert_plot_data <- likert(concerned_plot_data)
 
 # Create figure
-plot(concerned_plot_data, digits = 1, text.size = 6) +
+plot(concerned_likert_plot_data, digits = 1, text.size = 6, group.order = names(concerned_plot_data)) +
   labs(title = "Compared to what you think of as a typical researcher who uses preexisting observational data in your field,\nhow concerned are you with research trustworthiness, bias, rigour, and reproducibility ...") +
   theme(
     title = element_text(size = 14),

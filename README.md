@@ -9,6 +9,10 @@ researchers using preexisting datasets”. Other materials belonging to
 the project can be found on the project’s OSF page at
 <https://osf.io/x2dpn/>.
 
+**In order to replicate our results including the whole data
+preprocessing procedure with one click, please knit the
+`manuscript/manuscript.Rmd` file.**
+
 ## Folder structure
 
 The `data/` folder contains all the datafiles and the corresponding
@@ -28,6 +32,12 @@ rmarkdowns. Within this folder you can find the following files:
   analysis.
 
 The `manuscript/` folder contains the manuscript and supplementary
-materials documents with the analysis code embedded in them.
+materials documents with the analysis code embedded in them. The folder
+also includes the `interactive_report.Rmd` file, which includes an
+interactive document for reanalysing our results with different subsets
+of the data. To run the interactive document locally on your computer,
+click the *Run document* button in Rstudio or run the
+`rmarkdown::run(here::here("manuscript/interactive_report.Rmd"))`
+function in your R console.
 
 The `R/` folder contains any custom R functions and their documentation.
