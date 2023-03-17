@@ -1,41 +1,4 @@
----
-title             : "Supplementary materials C: A survey of registration practices among observational researchers using preexisting datasets"
-shorttitle        : "Supplementary materials C"
-  
-keywords          : "keywords"
-wordcount         : "X"
-floatsintext      : yes
-linenumbers       : yes
-draft             : no
-mask              : no
-figurelist        : no
-tablelist         : no
-footnotelist      : no
-classoption       : "man"
-output            : papaja::apa6_pdf
-editor_options: 
-  chunk_output_type: console
----
-
-```{r setup, include=FALSE}
-library("papaja")
-library(tidyverse)
-library(here)
-library(likert)
-library(kableExtra)
-
-# Source R scripts
-r_scripts <- list.files(here::here("R/"), full.names = TRUE)
-purrr::walk(r_scripts, source)
-
-# Loading data
-processed <- read_csv(here("data/processed/ecaw_processed_data.csv"))
-```
-
-```{r analysis-preferences}
-# Seed for random number generation
-knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
-```
+# Supplementary materials C
 
 ```{r numStudies, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=6, fig.height=3.2}
 # Create text for missing responses
@@ -58,9 +21,9 @@ processed %>%
   # annotate(geom = "text", x = 200, label = n_studies_missing_text, y = 30) +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 30)) +
   labs(
-    x = "Number of studies",
-    y = "Count",
-    title = "Approximately how many studies have you published using a preexisting observational dataset (e.g., the ALSPAC dataset)?"
+    x = "Number of publications",
+    y = "Number of respondents",
+    title = "Approximately how many studies have you published using\na preexisting observational dataset (e.g., the ALSPAC dataset)?"
   ) +
   papaja::theme_apa()
   
@@ -82,6 +45,9 @@ processed %>%
 
 ```{r}
 # Programming languages table
+# We use the number of all participants who responded to the questionnaire as the denominator
+denominator <- nrow(processed)
+
 processed %>% 
   rename(lang = programming_language) %>% 
   separate_rows(lang, sep = ",") %>% 
@@ -91,7 +57,7 @@ processed %>%
   filter(lang != "irrelevant") %>% 
   ungroup() %>% 
   mutate(
-    `Percentage of respondents` = round(n / sum(n) * 100, 0)
+    `Percentage of respondents` = round(n / denominator * 100, 0)
   ) %>% 
   arrange(desc(n)) %>% 
   rename(
@@ -109,8 +75,7 @@ processed %>%
   position = "H") %>%
   kable_styling(full_width = F,  position = "left", latex_options = "scale_down") %>%
   row_spec(row = 0, bold = TRUE) %>%
-  collapse_rows(columns = 1, valign = "top", latex_hline = "major", row_group_label_position = "identity") %>% 
-  add_footnote("One response was removed because it was irrelevant to the question. ", notation = "symbol")
+  collapse_rows(columns = 1, valign = "top", latex_hline = "major", row_group_label_position = "identity")
 ```
 
 (ref:table1c-caption) What programming language or software do you use for your analyses of preexisting observational data?
@@ -154,7 +119,7 @@ concerned_likert_plot_data <- likert(concerned_plot_data)
 
 # Create figure
 plot(concerned_likert_plot_data, digits = 1, text.size = 6, group.order = names(concerned_plot_data)) +
-  labs(title = "Compared to what you think of as a typical researcher who uses preexisting observational data in your field,\nhow concerned are you with research trustworthiness, bias, rigour, and reproducibility ...") +
+  labs(title = "Compared to what you think of as a typical researcher who uses preexisting observational\ndata in your field, how concerned are you with\nresearch trustworthiness, bias, rigour, and reproducibility ...") +
   theme(
     title = element_text(size = 14),
     axis.text.y = element_blank(),

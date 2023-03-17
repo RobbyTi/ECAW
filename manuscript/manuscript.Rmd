@@ -90,6 +90,8 @@ mask              : no
 figurelist        : no
 tablelist         : no
 footnotelist      : no
+appendix: "supplementary_materials.Rmd"
+
 classoption       : "man"
 output            : papaja::apa6_pdf
 editor_options: 
@@ -245,12 +247,12 @@ ecaw_reproducible <- support_percentage(
   )
 ```
 
-```{r typicallyEcawPlot, warning=FALSE, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=10, fig.height=6}
+```{r typicallyEcawPlot, warning=FALSE, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=12.2, fig.height=6}
 # Create typically trustworthy and reproducible plot
 # Check if there is any missing and don't understand responses separately
-# processed %>% 
-#   select(contains("typically_")) %>% 
-#   dplyr::filter(is.na(typically_reproducible) | is.na(typically_trustworthy) | typically_reproducible == "I don't understand the question" | typically_trustworthy == "I don't understand the question") %>% 
+# processed %>%
+#   select(contains("typically_")) %>%
+#   dplyr::filter(is.na(typically_reproducible) | is.na(typically_trustworthy) | typically_reproducible == "I don't understand the question" | typically_trustworthy == "I don't understand the question") %>%
 #   nrow()
 
 # Prepare plot data
@@ -276,14 +278,14 @@ typically_plot_data <- likert(typically_plot_data)
 
 # Create figure
 typically_plot <- 
-  plot(typically_plot_data, digits = 1, ordered = FALSE, legend.position = "right", text.size = 4.7) +
+  plot(typically_plot_data, digits = 1, ordered = FALSE, legend.position = "right", text.size = 5) +
   labs(title = "Typically, studies that analyze preexisting observational datasets\n(such as the ALSPAC dataset) are...") +
   theme(
     title = element_text(size = 14),
-    axis.text.y = element_blank(),
+    axis.text.y = element_text(size = 14),
     axis.text.x = element_text(size = 15),
-    axis.title.x = element_text(size = 15),
-    legend.text = element_text(size = 12),
+    axis.title.x = element_blank(),
+    legend.text = element_text(size = 13.5),
     legend.title = element_blank()
   )
 
@@ -343,15 +345,17 @@ ecaw_plot_data <- likert(ecaw_plot_data)
 
 # Create figure
 ecaw_plot <- 
-  plot(ecaw_plot_data, digits = 1, ordered = FALSE, legend.position = "right", text.size = 4.7) +
+  plot(ecaw_plot_data, digits = 1, ordered = FALSE, legend.position = "right", text.size = 5) +
   labs(title = "Compared to a typical study using preexisting observational data,\na study using an ECAW would be...") +
   theme(
     title = element_text(size = 14),
-    axis.text.y = element_blank(),
+    axis.text.y = element_text(size = 14),
     axis.text.x = element_text(size = 15),
     axis.title.x = element_text(size = 15),
-    legend.text = element_text(size = 12),
-    legend.title = element_blank()
+    legend.text = element_text(size = 13.5),
+    legend.title = element_blank(),
+    # legend.box.spacing = unit(0, "cm")
+    legend.box.margin = margin(t = 0, r = 0, b = 0, l = -2, unit = "cm")
   )
 
 # Join the two plots together to make one figure
@@ -430,7 +434,7 @@ script <- level_percentage(
 
 Over half of respondents reported that their studies using preexisting observational data are preregistered never or almost never (`r filter(preregistered, method_preregistered == "Never or almost never") %>% pull(percentage)`%), or sometimes (`r filter(preregistered, method_preregistered == "Sometimes") %>% pull(percentage)`%) (Figure 2A). About half reported sharing their analysis scripts never or almost never (`r filter(script, method_script == "Never or almost never") %>% pull(percentage)`%), or sometimes (`r filter(script, method_script == "Sometimes") %>% pull(percentage)`%) (Figure 2B). `r filter(blind, method_blind == "Never or almost never") %>% pull(percentage)`% reported that they never or almost never blind the data analyst (Figure 2C). Almost all respondents answered that they use both exploratory (`r exploratory`%) and confirmatory (`r confirmatory`%) analyses at least sometimes (Figure 2D-E).
 
-```{r methodPlot, warning=FALSE, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=10, fig.height=4.5}
+```{r methodPlot, warning=FALSE, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=11, fig.height=4.5}
 # Used methods figures
 method_plot_data <-
   processed %>% 
@@ -456,16 +460,16 @@ method_plot_data <-
           "I don't understand the question")
             ),
       type = case_when(
-        type == "blind" ~ "Blind the data analyst",
-        type == "confirmatory" ~ "Contain confirmatory analysis",
-        type == "exploratory" ~ "Contain exploratory analysis",
+        type == "blind" ~ "Blind the\ndata analyst",
+        type == "confirmatory" ~ "Contain\nconfirmatory analysis",
+        type == "exploratory" ~ "Contain\nexploratory analysis",
         type == "preregistered" ~ "Are preregistered",
         type == "script" ~ "Share analysis scripts",
       ),
       type = factor(type, levels = c(
-        "Contain exploratory analysis",
-        "Contain confirmatory analysis",
-        "Blind the data analyst",
+        "Contain\nexploratory analysis",
+        "Contain\nconfirmatory analysis",
+        "Blind the\ndata analyst",
         "Share analysis scripts",
         "Are preregistered"
       ))
@@ -510,9 +514,13 @@ method_plot_data %>%
   ) +
   papaja::theme_apa() +
   theme(
+    title = element_text(size = 17),
     axis.title.y = element_blank(),
-    legend.text = element_text(size = 12),
-    legend.title = element_blank()
+    axis.text = element_text(size = 15),
+    axis.title.x = element_text(size = 17),
+    legend.text = element_text(size = 14),
+    legend.title = element_blank(),
+    legend.box.margin = margin(t = 0, r = 0, b = 0, l = -0.5, unit = "cm")
   ) 
 ```
 
@@ -580,7 +588,7 @@ prefer <- support_percentage(
 
 `r pull(filter(willing, support == "positive"), percentage)`% of respondents agreed (versus `r pull(filter(willing, support == "negative"), percentage)`% who disagreed) that they would be less willing to use ALSPAC data if they were required to use an ECAW (Figure 3). `r pull(filter(opt, support == "positive"), percentage)`% agreed (`r pull(filter(opt, support == "negative"), percentage)`% disagreed) that they would opt-in if ALSPAC ran a study on ECAWs. `r pull(filter(study, support == "positive"), percentage)`% agreed (`r pull(filter(study, support == "negative"), percentage)`% disagreed) that ALSPAC should run a study on ECAWs. `r pull(filter(prefer, support == "positive"), percentage)`% agreed (`r pull(filter(prefer, support == "negative"), percentage)`% disagreed) that they would prefer using an ECAW than using typical preregistration.
 
-```{r alspacPlot, warning=FALSE, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=10, fig.height=4, message=FALSE}
+```{r alspacPlot, warning=FALSE, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=14, fig.height=4, message=FALSE}
 # Check if there is any missing and don't understand responses separately
 alspac_missing_text <-
   processed %>% 
@@ -629,29 +637,26 @@ alspac_plot_data <-
       )
     ) %>% 
   rename(
-    `If ALSPAC required that I\nuse an ECAW, I would be less willing to\nuse their data in my research` = alspac_less_willing,
-    `If ALSPAC ran a study\non ECAWs, I would opt-in.` = alspac_opt_in,
-    `ALSPAC should run\na study on ECAWs.` = alspac_study,
-    `I would prefer using\nan ECAW than using typical preregistration` = alspac_prefer_ecaw
+    `If ALSPAC required that I use an ECAW, I would be less willing to use their data in my research` = alspac_less_willing,
+    `If ALSPAC ran a study on ECAWs, I would opt-in.` = alspac_opt_in,
+    `ALSPAC should run a study on ECAWs.` = alspac_study,
+    `I would prefer using an ECAW than using typical preregistration` = alspac_prefer_ecaw
   )
 
 # Create likert package data not including the missing values
 alspac_plot_likert_data <- likert(alspac_plot_data)
 
 # Create figure
-alspac_plot <- 
-  plot(alspac_plot_likert_data, digits = 1, ordered = TRUE, group.order = names(alspac_plot_data), text.size = 6) +
+plot(alspac_plot_likert_data, digits = 1, ordered = TRUE, group.order = names(alspac_plot_data), text.size = 6) +
   labs(title = "Thinking about a study you may run with ALSPAC data (or one that you have recently run)...") +
   theme(
     title = element_text(size = 14),
-    axis.text.y = element_blank(),
+    axis.text.y = element_text(size = 13),
     axis.text.x = element_text(size = 15),
     axis.title.x = element_text(size = 15),
-    legend.text = element_text(size = 12),
+    legend.text = element_text(size = 13),
     legend.title = element_blank()
   )
-
-alspac_plot
 ```
 
 ```{r include=FALSE}
@@ -678,3 +683,12 @@ Table 1. Recurring topics in responses to the open-ended survey questions. The s
 
 ::: {#refs custom-style="Bibliography"}
 :::
+
+
+\newpage
+
+# (APPENDIX) Appendix {-}
+
+```{r child = "supplementary_materials.Rmd"}
+```
+
