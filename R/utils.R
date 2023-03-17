@@ -8,14 +8,23 @@ n_levels <- function(var) length(levels(var))
 center_level <- function(var) (n_levels(var) - 1) / 2 + 1
 
 #' Calculate the percentage of responses of each factor level
-level_percentage <- function(data, var, levels, exclude = NULL) {
-  data %>% 
+level_percentage <- function(data, var, levels, exclude = NULL, exclude_missing = TRUE) {
+  res <-
+    data %>% 
     filter(
       # exclude specified answer option(s)
-      {{var}} %ni% exclude & 
-        # exclude missing values by default
-        !is.na({{var}})
-    ) %>% 
+      {{var}} %ni% exclude
+    )
+  
+  # exclude missing responses
+  if(exclude_missing) {
+    res <-
+      res %>% 
+      filter(exclude_missing & !is.na({{var}}))
+  }
+
+  res <-
+    res %>% 
     mutate(
       # Transform to factor with level order specified in levels arg
       {{var}} := factor({{var}}, levels = levels)
@@ -37,9 +46,9 @@ level_percentage <- function(data, var, levels, exclude = NULL) {
 }
 
 #' Calculate percentage for each support category
-support_percentage <- function(data, var, levels, exclude = NULL) {
+support_percentage <- function(data, var, levels, exclude = NULL, exclude_missing = TRUE) {
   # Calculate the percentage of responses of each factor level
-  level_percentage(data, {{var}}, levels, exclude = exclude) %>% 
+  level_percentage(data, {{var}}, levels, exclude = exclude, exclude_missing = exclude_missing) %>% 
     # Drop these variables
     select(-n_sum, -percentage) %>% 
     mutate(

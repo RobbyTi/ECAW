@@ -83,7 +83,7 @@ abstract: |
 keywords          : "keywords"
 wordcount         : "X"
 # bibliography      : "references.bib"
-floatsintext      : no
+floatsintext      : yes
 linenumbers       : yes
 draft             : no
 mask              : no
@@ -97,53 +97,44 @@ editor_options:
 ---
 
 ```{r setup, include = FALSE, warning=FALSE, message=FALSE}
-# Load pacakges
 library("papaja")
 library(tidyverse)
 library(here)
 library(kableExtra)
 library(gt)
 library(patchwork)
+# The developer version is needed
 library(likert)
 library(viridis)
 # r_refs("references.bib")
+```
 
+```{r custom_scripts}
 # Source R scripts
 r_scripts <- list.files(here::here("R/"), full.names = TRUE)
 purrr::walk(r_scripts, source)
+```
 
-# Loading data
+```{r preprocessing}
+# loads source data, performs preprocessing, saves raw datafiles
+# source(here("preprocessing", "ecaw_source_raw_preprocessing.R"))
+
+# loads raw data, performs preprocessing, saves processed datafiles
+# source(here("preprocessing", "ecaw_raw_processed_preprocessing.R"))
+```
+
+```{r loading_data}
 processed <- read_csv(here("data/processed/ecaw_processed_data.csv"))
 ```
 
-```{r analysis-preferences}
+```{r analysis_preferences}
 # Seed for random number generation
-set.seed(42)
 knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
 ```
 
 # Introduction
-Many published research findings are non-reproducible and potentially false or misleading (Camerer et al., 2018; Errington et al., 2021; Ioannidis, 2005, 2008; Open Science Collaboration, 2015). Researcher bias, publication bias, selective reporting of results, incomplete reporting of methods, and other questionable research practices can lead to research waste, and useless or even harmful healthcare and policy interventions (e.g., Prasad & Cifu, 2019). To mitigate these issues, clinical trials research often blinds both participants and experimenters, and prospectively registers outcome measures. Observational research using preexisting data, however, is rarely registered and the researchers analyzing the data generally have access to complete datasets without any blinding imposed on them.
-
-In this survey study, we seeked to gather data on (1) the opinions and practices of observational researchers regarding rigour and reproducibility, and (2) their thoughts on the use of hold-out samples or cross validation for analyzing preexisting datasets. We hope to use this data to refine a potential intervention aimed to improve research quality and to determine whether observational researchers find such an intervention acceptable.
- 
-In this intervention we propose, a data management organization would first provide only a subset of the data a researcher requests. After the researcher prepares an analysis script based on the subset of data and uploads it to a registry—where it will be openly accessible and permanent—the data management organization then provides the full dataset and the researcher can proceed as they wish. The exact implementation (e.g., whether the data management organization runs quality checks on the analysis scripts) would depend on the preferences of the data management organization and the research community using their dataset.
-
-We call this process an Explore and Confirm Analysis Workflow (ECAW). Researchers may use the subset of data to generate hypotheses and/or to simply ensure that their intended analysis runs properly. ECAWs could serve as an alternative to typical preregistrations for observational research on preexisting data and may be more precise and comprehensive. Whereas typical preregistrations are written descriptions of a planned analysis and obstacles may arise in their implementation, ECAWs provide an analysis script that has been shown to run. ECAWs would not solve publication bias, but could make it easier to detect because the registered analysis script would serve as a form of preregistration. A version of this workflow has been successfully implemented by eight teams performing secondary data analysis on a dataset managed by the Psychological Science Accelerator group (Forscher et al., 2020). 
-
-Moreover, a recent study recruited 120 teams to analyze a single observational dataset and had half the teams preregister an analysis plan and the other half prepare an analysis plan by writing an analysis script based on a dataset with shuffled data for the variables of interest (i.e., the analysts were effectively blinded) (Sarafoglou et al., 2022). This blinded condition is comparable to ECAWs in that the researchers have access to enough data to develop an informed analysis, but without compromising the confirmatory nature of a final analysis on the complete dataset. The researchers found that the two workflows were comparable in terms of effort and that teams using blinded data analysis made fewer deviations from their analysis plan.
-
-We are interested in exploring real-world applications of these types of blind data analysis and hold-out samples (e.g., ECAWs) to improve research rigour and reproducibility. One example of such an initiative is OpenSAFELY (www.opensafely.org). This platform provides a dataset of simulated health records from which researchers can develop an analysis script. When ready, the researchers submit their analysis script which is run in a Trusted Research Environment (TRE) and automatically logged and made public. Thus, this workflow keeps health records anonymous while also documenting all analyses that are run on the real data.
-
-In the present study, we solicited structured feedback from observational researchers and found that respondents generally agreed that there could be a benefit to ECAWs and that they are worth testing. 
-
 
 # Methods
-We ran a descriptive and exploratory survey study. We had no hypotheses, but we did have two specific objectives. (1) To gain insights on the opinions and practices of researchers who already use preexisting observational datasets, in regards to the trustworthiness and reproducibility of research. (2) To use these insights to inform future research on how data management organizations can encourage rigorous and reproducible research practices. This objective includes assessing and refining potential interventions—such as ECAWs—and assessing their acceptability.
-
-We sent an email (supplementary material A) to invite researchers on the mailing list for the Avon Longitudinal Study of Parents and Children (ALSPAC) to participate in an online survey. ALSPAC is “a transgenerational prospective observational study investigating influences on health and development across the life course. It considers multiple genetic, epigenetic, biological, psychological, social and other environmental exposures in relation to a similarly diverse range of health, social and developmental outcomes.” (Boyd et al., 2013). Thus, our survey will reach researchers in diverse disciplines that use observational data. The survey was open from 10 Oct 2022 to 1 Nov 2022. We sent two reminder emails, exactly one week and two weeks after the original email invitation.
-
-The survey (supplementary material B) contained 6 blocks. Block 1 assessed whether respondents agree that observational research using preexisting data is trustworthy and reproducible (2 questions). Block 2 asked respondents about their own research practices, including preregistration, blinding, and sharing analysis scripts (5 questions). Between Block 2 and Block 3, the survey described ECAWs. Block 3 assessed whether respondents agree that ECAWs would make observational research using preexisting data more trustworthy and reproducible (2 questions). Block 4 directly asked respondents whether ALSPAC should run a study on ECAWs and whether they would participate (5 questions). Block 5 contained open-ended questions to garner information that the survey could otherwise not capture (3 questions). Block 6 collected information about the respondents. (4 questions). Open ended questions were analyzed….[add explanation]
 
 # Results
 ## Participants
@@ -157,6 +148,8 @@ language_text <-
   count(lang) %>% 
   filter(!is.na(lang)) %>% 
   arrange(desc(n)) %>% 
+  # Removing irrelevant
+  filter(lang != "irrelevant") %>% 
   mutate(lang_n = glue::glue("{lang} (n = {n})")) %>% 
   pull(lang_n) %>% 
   glue::glue_collapse(., sep = ", ", last = ", and ")
@@ -172,64 +165,18 @@ concerned <- support_percentage(
     "as concerned as a typical researcher in my field",
     "somewhat more concerned",
     "more concerned",
-    "very much more concerned"
+    # This level label starts with a capital letter
+    "Very much more concerned"
     )
   )
 ```
 
-We invited the ALSPAC mailing list to participate, which included 1148 email addresses. 54 emails bounced, leaving 1094 emails that went through. The survey was completed `r nrow(processed)` times and partially completed `r nrow(dplyr::filter(processed, has_missing)) ` times, leading to a response rate of `r round(nrow(processed) / 1094 * 100)`% for completed surveys and `r round(nrow(filter(processed, has_missing)) / 1094 * 100)`% for incomplete surveys.[^1] The results presented in this manuscript only include completed surveys.[^2] The median time taken for complete survey responses was `r median(processed$duration_in_mins)` minutes (IQR: `r round(quantile(processed$duration_in_mins, .75, na.rm = TRUE), 1)` - `r round(quantile(processed$duration_in_mins, .25, na.rm = T), 1)`).
+We invited the ALSPAC mailing list to participate, which included 1148 email addresses. 54 emails bounced, leaving 1094 emails that went through. The survey was completed `r nrow(processed)` times and partially completed `r nrow(dplyr::filter(processed, has_missing)) ` times, leading to a response rate of `r round(nrow(processed) / 1094 * 100)`% for complete surveys and `r round(nrow(filter(processed, has_missing)) / 1094 * 100)`% for incomplete surveys.[^1] The median time taken for complete survey responses was `r median(processed$duration_in_mins)` minutes (IQR: `r round(quantile(processed$duration_in_mins, .25, na.rm = TRUE), 1)` to `r round(quantile(processed$duration_in_mins, .75, na.rm = T), 1)`).
 
-Respondents published a median of `r median(processed$n_studies)` (IQR `r round(quantile(processed$n_studies, .75, na.rm = TRUE), 1)` - `r round(quantile(processed$n_studies, .25, na.rm = TRUE), 1)`) studies using preexisting observational data (Figure S1). They reported using the programming languages `r language_text` (Table S1). `r pull(filter(concerned, support == "positive"), percentage)`% of participants reported being more concerned, versus `r pull(filter(concerned, support == "negative"), percentage)`% who reported being less concerned, with research trustworthiness, bias, rigour, and reproducibility compared to what they think of as a typical research who uses preexisting observational data (Figure #).  
+Respondents published a median of `r median(processed$n_studies)` (IQR `r round(quantile(processed$n_studies, .25, na.rm = TRUE), 1)` to `r round(quantile(processed$n_studies, .75, na.rm = TRUE), 1)`) studies using preexisting observational data (Figure S1). They reported using the programming languages `r language_text` (Table S1)[^2]. `r pull(filter(concerned, support == "positive"), percentage)`% of participants reported being more concerned with research trustworthiness, bias, rigour, and reproducibility compared to what they think of as a typical research who uses preexisting observational data (Figure C2); `r pull(filter(concerned, support == "negative"), percentage)`% reported being less concerned.
 
-```{r, include=FALSE}
-# Concerned figure data preparation
-concerned_plot_data <-
-  processed %>% 
-  select(concerned) %>% 
-  mutate(
-    concerned = tolower(concerned),
-    concerned = factor(concerned, levels = c(
-      "very much less concerned",
-      "less concerned",
-      "somewhat less concerned",
-      "as concerned as a typical researcher in my field",
-      "somewhat more concerned",
-      "more concerned",
-      "very much more concerned"
-      )
-    )
-  )
-
-# Check distinct values in data
-distinct(concerned_plot_data, concerned)
-
-# Create missing values text
-concerned_missing_text <- 
-  concerned_plot_data %>% 
-  filter(is.na(concerned)) %>% 
-  summarise(
-    n = n(),
-    missing_text = paste0("missing = ", n)
-  ) %>% 
-  pull(missing_text)
-
-# Create likert package data not including the missing values
-concerned_plot_data <- likert(filter(concerned_plot_data, !is.na(concerned)))
-
-# Create figure
-concerned_plot <- 
-  plot(concerned_plot_data) +
-  theme(
-    axis.text.y = element_blank()
-  )
-```
-
-```{r echo=FALSE}
-concerned_plot
-```
-
-[^1]: This mailing list has been around for 30 years and may contain email addresses that are no longer monitored. For example, we received one email reply stating that the recipient hasn’t been active in research for 30 years. Thus, the response rate may be greater if we are only including active researchers.
-[^2]: Results that include incomplete surveys are available in the Supplementary Material.
+[^1]: The ALSPAC mailing list has been active for >30 years and may contain email addresses that are no longer monitored. For example, we received one email reply stating that the recipient hasn’t been active in research for 30 years. Excluding these email addresses would increase the response rate, but we do not know by how much.
+[^2]: Participants could select multiple responses to this survey question.
 [^3]: The survey defined trustworthy as: “meaning that the results and conclusions of the publications are valid, reliable, rigorous, and accurate. That they merit trust.”
 [^4]: The survey defined reproducible “in the sense that other researchers re-analysing the data with the same research question would produce similar results.”
 
@@ -287,13 +234,13 @@ ecaw_reproducible <- support_percentage(
   )
 ```
 
-```{r include=FALSE}
+```{r typicallyEcawPlot, warning=FALSE, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=10, fig.height=6}
 # Create typically trustworthy and reproducible plot
 # Check if there is any missing and don't understand responses separately
-processed %>% 
-  select(contains("typically_")) %>% 
-  dplyr::filter(is.na(typically_reproducible) | is.na(typically_trustworthy) | typically_reproducible == "I don't understand the question" | typically_trustworthy == "I don't understand the question") %>% 
-  nrow()
+# processed %>% 
+#   select(contains("typically_")) %>% 
+#   dplyr::filter(is.na(typically_reproducible) | is.na(typically_trustworthy) | typically_reproducible == "I don't understand the question" | typically_trustworthy == "I don't understand the question") %>% 
+#   nrow()
 
 # Prepare plot data
 typically_plot_data <- 
@@ -318,10 +265,19 @@ typically_plot_data <- likert(typically_plot_data)
 
 # Create figure
 typically_plot <- 
-  plot(typically_plot_data)
+  plot(typically_plot_data, digits = 1, ordered = FALSE, legend.position = "right", text.size = 4.7) +
+  labs(title = "Typically, studies that analyze preexisting observational datasets\n(such as the ALSPAC dataset) are...") +
+  theme(
+    title = element_text(size = 14),
+    axis.text.y = element_blank(),
+    axis.text.x = element_text(size = 15),
+    axis.title.x = element_text(size = 15),
+    legend.text = element_text(size = 12),
+    legend.title = element_blank()
+  )
 
 # Create ecaw trustworthy and reproducible plot
-# Check if there is any missing and don't understand responses separately
+# Calculate missing responses
 ecaw_missing_text <-
   processed %>% 
   select(contains("ecaw_")) %>% 
@@ -376,18 +332,22 @@ ecaw_plot_data <- likert(ecaw_plot_data)
 
 # Create figure
 ecaw_plot <- 
-  plot(ecaw_plot_data)
+  plot(ecaw_plot_data, digits = 1, ordered = FALSE, legend.position = "right", text.size = 4.7) +
+  labs(title = "Compared to a typical study using preexisting observational data,\na study using an ECAW would be...") +
+  theme(
+    title = element_text(size = 14),
+    axis.text.y = element_blank(),
+    axis.text.x = element_text(size = 15),
+    axis.title.x = element_text(size = 15),
+    legend.text = element_text(size = 12),
+    legend.title = element_blank()
+  )
+
+# Join the two plots together to make one figure
+typically_plot + ecaw_plot + plot_layout(ncol = 1, nrow = 2)
 ```
 
-Respondents generally agreed that studies that analyze preexisting observational datasets are trustworthy (`r pull(filter(typically_trustworthy, support == "positive"), percentage)`%) and reproducible (`r pull(filter(typically_reproducible, support == "positive"), percentage)`%) (Figure 1A). At the same time, many agreed that a study using an ECAW would be more trustworthy[^3] (`r pull(filter(ecaw_trustworthy, support == "positive"), percentage)`%) and more reproducible[^4] (`r pull(filter(ecaw_reproducible, support == "positive"), percentage)`%) compared to a typical study using preexisting observational data (Figure 1B).
-
-```{r}
-typically_plot
-```
-
-```{r}
-ecaw_plot
-```
+Respondents generally agreed that studies that analyze preexisting observational datasets are trustworthy[^3] (`r pull(filter(typically_trustworthy, support == "positive"), percentage)`%) and reproducible[^4] (`r pull(filter(typically_reproducible, support == "positive"), percentage)`%) (Figure 1A). At the same time, many agreed that a study using an ECAW would be _more_ trustworthy (`r pull(filter(ecaw_trustworthy, support == "positive"), percentage)`%) and _more_ reproducible (`r pull(filter(ecaw_reproducible, support == "positive"), percentage)`%) compared to a typical study using preexisting observational data (Figure 1B).
 
 ```{r include=FALSE}
 confirmatory <- level_percentage(
@@ -457,9 +417,9 @@ script <- level_percentage(
   )
 ```
 
-Almost all respondents answered that they use both exploratory (`r exploratory`%) and confirmatory (`r confirmatory`%) analyses at least sometimes (Figure 2A-B). About half reported sharing their analysis scripts never or almost never (`r filter(script, method_script == "Never or almost never") %>% pull(percentage)`%), or sometimes (`r filter(script, method_script == "Sometimes") %>% pull(percentage)`%) (Figure 2C). Over half reported preregistering their studies never or almost never (`r filter(preregistered, method_preregistered == "Never or almost never") %>% pull(percentage)`%), or sometimes (`r filter(preregistered, method_preregistered == "Sometimes") %>% pull(percentage)`%) (Figure 2D). `r filter(blind, method_blind == "Never or almost never") %>% pull(percentage)`% reported that they never or almost never blind the data analyst (Figure 2E).
+Over half of respondents reported that their studies using preexisting observational data are preregistered never or almost never (`r filter(preregistered, method_preregistered == "Never or almost never") %>% pull(percentage)`%), or sometimes (`r filter(preregistered, method_preregistered == "Sometimes") %>% pull(percentage)`%) (Figure 2A). About half reported sharing their analysis scripts never or almost never (`r filter(script, method_script == "Never or almost never") %>% pull(percentage)`%), or sometimes (`r filter(script, method_script == "Sometimes") %>% pull(percentage)`%) (Figure 2B). `r filter(blind, method_blind == "Never or almost never") %>% pull(percentage)`% reported that they never or almost never blind the data analyst (Figure 2C). Almost all respondents answered that they use both exploratory (`r exploratory`%) and confirmatory (`r confirmatory`%) analyses at least sometimes (Figure 2D-E).
 
-```{r}
+```{r methodPlot, warning=FALSE, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=10, fig.height=4.5}
 # Used methods figures
 method_plot_data <-
   processed %>% 
@@ -485,12 +445,19 @@ method_plot_data <-
           "I don't understand the question")
             ),
       type = case_when(
-        type == "blind" ~ "Blind analysis",
-        type == "confirmatory" ~ "Confirmatory analysis",
-        type == "exploratory" ~ "Exploratory analysis",
-        type == "preregistered" ~ "Preregistration",
-        type == "script" ~ "Analysis script",
-      )
+        type == "blind" ~ "Blind the data analyst",
+        type == "confirmatory" ~ "Contain confirmatory analysis",
+        type == "exploratory" ~ "Contain exploratory analysis",
+        type == "preregistered" ~ "Are preregistered",
+        type == "script" ~ "Share analysis scripts",
+      ),
+      type = factor(type, levels = c(
+        "Contain exploratory analysis",
+        "Contain confirmatory analysis",
+        "Blind the data analyst",
+        "Share analysis scripts",
+        "Are preregistered"
+      ))
       ) %>% 
   group_by(type) %>%
   tidyr::complete(scale, fill = list(n = 0)) %>% 
@@ -511,8 +478,7 @@ method_plot_data <-
 #   group_by(type) %>% 
 #   summarise(text = stringr::str_c(text, collapse = "\n"))
 
-method_plot <-
-  method_plot_data %>% 
+method_plot_data %>% 
   # filter(scale %ni% c("Missing", "I don't understand the question")) %>% 
   ggplot() +
   aes(
@@ -528,16 +494,15 @@ method_plot <-
   scale_fill_viridis(option = "A", discrete = TRUE) +
   labs(
     x = "Percentage",
-    fill = "Response levels"
+    fill = "Response",
+    title = "The studies using preexisting observational data that I am involved in..."
   ) +
   papaja::theme_apa() +
   theme(
-    axis.title.y = element_blank()
+    axis.title.y = element_blank(),
+    legend.text = element_text(size = 12),
+    legend.title = element_blank()
   ) 
-```
-
-```{r echo=FALSE}
-method_plot
 ```
 
 ```{r include=FALSE, warning=FALSE, message=FALSE}
@@ -604,7 +569,7 @@ prefer <- support_percentage(
 
 `r pull(filter(willing, support == "positive"), percentage)`% of respondents agreed (versus `r pull(filter(willing, support == "negative"), percentage)`% who disagreed) that they would be less willing to use ALSPAC data if they were required to use an ECAW (Figure 3). `r pull(filter(opt, support == "positive"), percentage)`% agreed (`r pull(filter(opt, support == "negative"), percentage)`% disagreed) that they would opt-in if ALSPAC ran a study on ECAWs. `r pull(filter(study, support == "positive"), percentage)`% agreed (`r pull(filter(study, support == "negative"), percentage)`% disagreed) that ALSPAC should run a study on ECAWs. `r pull(filter(prefer, support == "positive"), percentage)`% agreed (`r pull(filter(prefer, support == "negative"), percentage)`% disagreed) that they would prefer using an ECAW than using typical preregistration.
 
-```{r warning=FALSE, message=FALSE}
+```{r alspacPlot, warning=FALSE, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=10, fig.height=4, message=FALSE}
 # Check if there is any missing and don't understand responses separately
 alspac_missing_text <-
   processed %>% 
@@ -653,38 +618,45 @@ alspac_plot_data <-
       )
     ) %>% 
   rename(
-    `ALSPAC should\nrun a study` = alspac_study,
-    `I would\nprefer ECAW` = alspac_prefer_ecaw,
-    `I would opt in` = alspac_opt_in,
-    `I would be\nless willing to use` = alspac_less_willing
+    `If ALSPAC required that I\nuse an ECAW, I would be less willing to\nuse their data in my research` = alspac_less_willing,
+    `If ALSPAC ran a study\non ECAWs, I would opt-in.` = alspac_opt_in,
+    `ALSPAC should run\na study on ECAWs.` = alspac_study,
+    `I would prefer using\nan ECAW than using typical preregistration` = alspac_prefer_ecaw
   )
 
 # Create likert package data not including the missing values
-alspac_plot_data <- likert(alspac_plot_data)
+alspac_plot_likert_data <- likert(alspac_plot_data)
 
 # Create figure
 alspac_plot <- 
-  plot(alspac_plot_data)
-```
+  plot(alspac_plot_likert_data, digits = 1, ordered = TRUE, group.order = names(alspac_plot_data), text.size = 6) +
+  labs(title = "Thinking about a study you may run with ALSPAC data (or one that you have recently run)...") +
+  theme(
+    title = element_text(size = 14),
+    axis.text.y = element_blank(),
+    axis.text.x = element_text(size = 15),
+    axis.title.x = element_text(size = 15),
+    legend.text = element_text(size = 12),
+    legend.title = element_blank()
+  )
 
-```{r}
 alspac_plot
 ```
 
-Address the concerns from the open-ended questions [transfer to right side of table 1]. For some research questions, the subset method may not work. In which case, a larger sample could be provided, or better yet, a synthetic dataset could be provided. The time burden is likely more than when not preregistering, but efforts can be made to minimize it. One study comparing ~120 analyses found that an ECAW-like workflow took similar effort to preregistration (although that was for a relatively clean dataset—whereas prereg may take longer if the dataset is a mess; or viceversa). The concern that analysis would need to change after writing an ECAW is not a big deal—having the ECAW written could provide evidence that the changes were small. This is often raised as an issue in preregistraiton as well, but is acceptable or encouraged when it makes sense to do so. Finally the issue that ECAW would not work for situations where researchers are reanalyzing a dataset they already have is true, and it simply would not be possible in this situation (in which case, the researcher would not be requesting that data again anyhow, so it’s beside the point). 
+```{r include=FALSE}
+# Open ended questions
+open_ended <-
+  processed %>% 
+  select(response_id, unsure_explain, drawback_ecaw, suggestions, comments) %>% 
+  pivot_longer(cols = c(unsure_explain, drawback_ecaw, suggestions, comments), names_to = "variable", values_to = "value") %>% 
+  filter(!is.na(value))
+```
+
+Table 1. Recurring topics in responses to the open-ended survey questions. The survey included 4 open-ended questions with broad prompts regarding running a study on ECAWs, benefits and drawbacks of ECAWs, related research practices, and general comments. These questions received a total of (`r nrow(open_ended)`) responses from (`r nrow(distinct(open_ended, response_id))`) unique respondents. A complete list of responses are viewable in the open data [LINK]. We synthesized the response to open-ended questions into the 9 topics on the left side of this table. We divide these into three sections: (i) concerns about the acceptability of ECAWs, (ii) concerns that ECAWs will not have their intended impact, and (iii) alternative interventions that may achieve similar goals as typical preregistration and ECAWs. On the right side of the table, we provide a reflection on each topic. 
 
 ## Exploratory analyses
 
 # Discussion
-Are ECAWs applicable 1? Yes. In short, ECAWs could be implemented in many cases. Many respondents use software that would allow for the ECAW format (R, ?Stata?), although some use software where this would be more difficult (SPSS, ?SAS?). Most have experience publishing relevant articles, so are familiar with the process. And most respondents also run studies that contain confirmatory analyses.
-
-Are ECAWs applicable 2? Yes. Current methods to improve rigour and reproducibility are underused (sharing analysis scripts, blinding data analysts, preregisteration).  
-
-How biased are these results? Many that are earlier in their career based on # of publications. Also many are more concerned than others about reproducibility. So this may, unsurprisingly, be a somewhat biased sample. Although the 10% response rate was quite good.
-
-Should we ALSPAC (or another org) run a study? Probably. 
-
-How would ECAWs be implemented? Would ALSPAC or the org check whether they run. Where would the be uploaded. Would the primary outcomes need to be clearly identified in the output. These would depend on the organization running such an experiment / workflow. 
 
 # Acknowledgements
 

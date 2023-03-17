@@ -17,6 +17,7 @@ library(patchwork)
 library(likert)
 library(viridis)
 library(shiny)
+library(plotly)
 # r_refs("references.bib")
 
 # Source R scripts
@@ -36,30 +37,82 @@ Subset data for all the results.
 ```{r, echo=FALSE}
 inputPanel(
   sliderInput("n_studies", label = "Number of studies using ALSPAC:",
-               min = min(processed$n_studies, na.rm = T), max = max(processed$n_studies, na.rm = T), value = max(processed$n_studies, na.rm = T), step = 1),
-  radioButtons("methods", label = "Used the following methods:", choices = c("Blind", "Script", "Confirmatory", "Exploratory"), selected = NULL, inline = FALSE),
-    radioButtons("concerned", label = "Concerned with rigour and reproducibility:", choices = c("Negative", "Neutral", "Support"), selected = NULL, inline = FALSE)
-)
+              min = min(processed$n_studies, na.rm = T),
+              max = max(processed$n_studies, na.rm = T), value = c(0, max(processed$n_studies, na.rm = T)), step = 1),
+  selectInput("methods", label = "Used the following methods:",
+              choices = c(
+                "Blind" = "method_blind",
+                "Script" = "method_script",
+                "Preregistration" = "method_preregistered",
+                "Confirmatory" = "method_confirmatory", 
+                "Exploratory" = "method_exploratory"),
+              selected = NULL, multiple = TRUE),
+  selectInput("concerned", label = "Level of concern with rigour and reproducibility:",
+              choices = c(
+                "Less concerned",
+                "Neutral",
+                "More concerned"),
+              selected = c(
+                "Less concerned",
+                "Neutral",
+                "More concerned"), multiple = TRUE),
+  selectInput("language", label = "Programming language used for the analysis:",
+              choices = c(
+                "R",
+                "Stata",
+                "SPSS",
+                "SAS",
+                "Python",
+                "Mplus",
+                "Bash",
+                "MATLAB",
+                "Nextflow",
+                "plink2",
+                "irrelevant"
+              ),
+              selected = c(
+                "R",
+                "Stata",
+                "SPSS",
+                "SAS",
+                "Python",
+                "Mplus",
+                "Bash",
+                "MATLAB",
+                "Nextflow",
+                "plink2",
+                "irrelevant"
+              ), multiple = TRUE)
+  )
 
 # Filter data
 filtered_data <- reactive({
+  concerned_options <-list(
+    "Less concerned" =  c("very much less concerned", "less concerned", "somewhat less concerned"),
+    "Neutral" =  c("as concerned as a typical researcher in my field"),
+    "More concerned" = c("somewhat more concerned", "more concerned", "Very much more concerned")
+  )
+  
+  concerned_filter <- unlist(concerned_options[input$concerned], use.names = FALSE)
+  
   processed %>% 
-    filter(
-      n_studies == input$n_studies
-    )
+    filter(n_studies >= input$n_studies[1] & n_studies <= input$n_studies[2] | is.na(n_studies)) %>% 
+    filter(if_all(input$methods, ~ . != "Never or almost never")) %>% 
+    filter(concerned %in% concerned_filter | is.na(concerned)) %>% 
+    filter(str_detect(programming_language, paste(input$language, collapse="|")) | is.na(programming_language))
   })
+# select(filtered_data(), concerned)
+# shiny::renderTable(filtered_data())
+shiny::renderText({nrow(filtered_data())})
 ```
 
-# Reproducibility and trustworthiness
-
-The reproducible and trustworthiness ratings with the current ALSPAC system.
-
-```{r}
+```{r echo=FALSE, warning=FALSE}
+# Create typically trustworthy and reproducible plot
 # Prepare plot data
-typically_plot_data <- 
-  processed %>%
-  select(contains("typically_")) %>% 
-  mutate(
+typically_plot_data <- reactive({
+  filtered_data() %>%
+    select(contains("typically_")) %>%
+    mutate(
     across(
       .fns = ~ factor(., levels =   c(
     "Strongly disagree",
@@ -67,17 +120,84 @@ typically_plot_data <-
     "Neither agree nor disagree",
     "Somewhat agree",
     "Strongly agree"))
-    )) %>% 
-  rename(
-    Reproducible = typically_reproducible,
-    Trustworthy = typically_trustworthy
-  )
-
-# Create likert package data not including the missing values
-typically_plot_data <- likert(typically_plot_data)
+    )) %>%
+    rename(
+      Reproducible = typically_reproducible,
+      Trustworthy = typically_trustworthy
+      ) %>%
+    # Create likert package data not including the missing values
+    likert(.)
+})
 
 # Create figure
-typically_plot <- 
-  plot(typically_plot_data)
+typically_plot <- reactive({
+  plot(typically_plot_data(), digits = 1, ordered = FALSE, legend.position = "right") +
+  labs(title = "Typically, studies that analyze preexisting observational datasets (such as the ALSPAC dataset) are...")
+})
+
+# Create ecaw trustworthy and reproducible plot
+# Prepare plot data
+ecaw_plot_data <- reactive({
+  filtered_data() %>%
+  select(contains("ecaw_")) %>%
+  # Transform not wanted response values to NA
+  # likert::likert drops NA values silently
+  # When var transformed to factor these values would be transformed to NA
+  # Automatically but I try to be explicit
+  mutate(
+    across(
+      everything(),
+      ~ case_when(
+        . == "I don't understand the question" ~ NA_character_,
+        TRUE ~ .
+      )
+    )
+  ) %>%
+  mutate(
+    across(
+      .fns = ~ factor(., levels =   c(
+          "Much less",
+          "Somewhat less",
+          "About the same",
+          "Somewhat more",
+          "Much more"))
+    )) %>%
+  rename(
+    Reproducible = ecaw_reproducible,
+    Trustworthy = ecaw_trustworthy
+  ) %>%
+    # Create likert package data not including the missing values
+    likert(.)
+})
+
+
+# Create figure
+ecaw_plot <- reactive({
+  plot(ecaw_plot_data, digits = 1, ordered = FALSE, legend.position = "right") +
+  labs(title = "Compared to a typical study using preexisting observational data, a study using an ECAW would be...")
+})
+
+# Join the two plots together to make one figure
+renderPlot({ typically_plot + ecaw_plot + plot_layout(ncol = 1, nrow = 2) })
+```
+
+```{r}
+renderPlot({
+# Create histogram of the number of observational studies done
+filtered_data() %>% 
+  # Exclude missing responses
+  filter(!is.na(n_studies)) %>% 
+  ggplot() +
+  aes(x = n_studies) +
+  geom_histogram(binwidth = 3) +
+  # annotate(geom = "text", x = 200, label = n_studies_missing_text, y = 30) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 30)) +
+  labs(
+    x = "Number of studies",
+    y = "Count",
+    title = "Approximately how many studies have you published using a preexisting observational dataset (e.g., the ALSPAC dataset)?"
+  ) +
+  papaja::theme_apa()
+})
 ```
 
