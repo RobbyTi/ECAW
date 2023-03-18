@@ -119,12 +119,13 @@ concerned_likert_plot_data <- likert(concerned_plot_data)
 
 # Create figure
 plot(concerned_likert_plot_data, digits = 1, text.size = 6, group.order = names(concerned_plot_data)) +
-  labs(title = "Compared to what you think of as a typical researcher who uses preexisting observational\ndata in your field, how concerned are you with\nresearch trustworthiness, bias, rigour, and reproducibility ...") +
+  scale_y_continuous(labels = c("100%", "50%", "0%", "50%", "100%"), limits = c(-105, 105)) +
+  labs(title = "Compared to what you think of as a typical researcher who uses\npreexisting observational data in your field, how concerned\nare you with research trustworthiness, bias, rigour, and reproducibility ...") +
   theme(
     title = element_text(size = 14),
     axis.text.y = element_blank(),
     axis.text.x = element_text(size = 15),
-    axis.title.x = element_text(size = 15),
+    axis.title.x = element_blank(),
     legend.text = element_text(size = 10),
     legend.title = element_blank()
   )

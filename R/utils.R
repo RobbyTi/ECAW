@@ -20,10 +20,10 @@ level_percentage <- function(data, var, levels, exclude = NULL, exclude_missing 
   if(exclude_missing) {
     res <-
       res %>% 
-      filter(exclude_missing & !is.na({{var}}))
+      filter(!is.na({{var}}))
   }
 
-  res <-
+  # res <-
     res %>% 
     mutate(
       # Transform to factor with level order specified in levels arg

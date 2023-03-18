@@ -98,7 +98,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r setup, include = FALSE, warning=FALSE, message=FALSE}
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
 library("papaja")
 library(tidyverse)
 library(here)
@@ -112,7 +112,7 @@ library(viridis)
 # r_refs("references.bib")
 ```
 
-```{r custom_scripts}
+```{r customScripts}
 # Source R scripts
 r_scripts <- list.files(here::here("R/"), full.names = TRUE)
 purrr::walk(r_scripts, source)
@@ -124,23 +124,25 @@ xfun::Rscript_call(
   rmarkdown::render,
   list(
     input = here::here("preprocessing", "ecaw_source_raw_preprocessing.Rmd"),
-    output_format = 'html_document')
+    output_format = "html_document"
   )
+)
 
 # loads raw data, performs preprocessing, saves processed datafiles
 xfun::Rscript_call(
   rmarkdown::render,
   list(
     input = here::here("preprocessing", "ecaw_raw_processed_preprocessing.Rmd"),
-    output_format = 'html_document')
+    output_format = "html_document"
   )
+)
 ```
 
-```{r loading_data}
+```{r loadingData}
 processed <- read_csv(here::here("data/processed/ecaw_processed_data.csv"))
 ```
 
-```{r analysis_preferences}
+```{r analysisPreferences}
 # Seed for random number generation
 knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
 ```
@@ -152,21 +154,23 @@ knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
 # Results
 ## Participants
 
-```{r include=FALSE}
+```{r languageDescriptives, include=FALSE}
 # List of used programming languages and their counts text
-language_text <-
-  processed %>% 
-  rename(lang = programming_language) %>% 
-  separate_rows(lang, sep = ",") %>% 
-  count(lang) %>% 
-  filter(!is.na(lang)) %>% 
-  arrange(desc(n)) %>% 
+language_text <- 
+  processed %>%
+  rename(lang = programming_language) %>%
+  separate_rows(lang, sep = ",") %>%
+  count(lang) %>%
+  filter(!is.na(lang)) %>%
+  arrange(desc(n)) %>%
   # Removing irrelevant
-  filter(lang != "irrelevant") %>% 
-  mutate(lang_n = glue::glue("{lang} (n = {n})")) %>% 
-  pull(lang_n) %>% 
+  filter(lang != "irrelevant") %>%
+  mutate(lang_n = glue::glue("{lang} (n = {n})")) %>%
+  pull(lang_n) %>%
   glue::glue_collapse(., sep = ", ", last = ", and ")
+```
 
+```{r concernedDescriptives, include=FALSE}
 # Calculate concerned percentage
 concerned <- support_percentage(
   processed,
@@ -180,8 +184,8 @@ concerned <- support_percentage(
     "more concerned",
     # This level label starts with a capital letter
     "Very much more concerned"
-    )
   )
+)
 ```
 
 We invited the ALSPAC mailing list to participate, which included 1148 email addresses. 54 emails bounced, leaving 1094 emails that went through. The survey was completed `r nrow(processed)` times and partially completed `r nrow(dplyr::filter(processed, has_missing)) ` times, leading to a response rate of `r round(nrow(processed) / 1094 * 100)`% for complete surveys and `r round(nrow(filter(processed, has_missing)) / 1094 * 100)`% for incomplete surveys.[^1] The median time taken for complete survey responses was `r median(processed$duration_in_mins)` minutes (IQR: `r round(quantile(processed$duration_in_mins, .25, na.rm = TRUE), 1)` to `r round(quantile(processed$duration_in_mins, .75, na.rm = T), 1)`).
@@ -195,7 +199,7 @@ Respondents published a median of `r median(processed$n_studies)` (IQR `r round(
 
 ## Survey results
 
-```{r include=FALSE}
+```{r typicallyEcawDescriptives, include=FALSE}
 # Calculate typical trustworthiness and reproducibility ratings
 typically_trustworthy <- support_percentage(
   processed,
@@ -205,9 +209,10 @@ typically_trustworthy <- support_percentage(
     "Somewhat disagree",
     "Neither agree nor disagree",
     "Somewhat agree",
-    "Strongly agree"),
+    "Strongly agree"
+  ),
   "I don't understand the question"
-  )
+)
 
 typically_reproducible <- support_percentage(
   processed,
@@ -217,9 +222,10 @@ typically_reproducible <- support_percentage(
     "Somewhat disagree",
     "Neither agree nor disagree",
     "Somewhat agree",
-    "Strongly agree"),
+    "Strongly agree"
+  ),
   "I don't understand the question"
-  )
+)
 
 # Calculate ecaw trustworthiness and reproducibility ratings
 ecaw_trustworthy <- support_percentage(
@@ -230,9 +236,10 @@ ecaw_trustworthy <- support_percentage(
     "Somewhat less",
     "About the same",
     "Somewhat more",
-    "Much more"),
+    "Much more"
+  ),
   "I don't understand the question"
-  )
+)
 
 ecaw_reproducible <- support_percentage(
   processed,
@@ -242,12 +249,13 @@ ecaw_reproducible <- support_percentage(
     "Somewhat less",
     "About the same",
     "Somewhat more",
-    "Much more"),
+    "Much more"
+  ),
   "I don't understand the question"
-  )
+)
 ```
 
-```{r typicallyEcawPlot, warning=FALSE, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=12.2, fig.height=6}
+```{r typicallyEcawPlot, warning=FALSE, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=12.8, fig.height=6, fig.path='figs/', dev=c('png', 'pdf')}
 # Create typically trustworthy and reproducible plot
 # Check if there is any missing and don't understand responses separately
 # processed %>%
@@ -256,18 +264,20 @@ ecaw_reproducible <- support_percentage(
 #   nrow()
 
 # Prepare plot data
-typically_plot_data <- 
+typically_plot_data <-
   processed %>%
-  select(contains("typically_")) %>% 
+  select(contains("typically_")) %>%
   mutate(
     across(
-      .fns = ~ factor(., levels =   c(
-    "Strongly disagree",
-    "Somewhat disagree",
-    "Neither agree nor disagree",
-    "Somewhat agree",
-    "Strongly agree"))
-    )) %>% 
+      .fns = ~ factor(., levels = c(
+        "Strongly disagree",
+        "Somewhat disagree",
+        "Neither agree nor disagree",
+        "Somewhat agree",
+        "Strongly agree"
+      ))
+    )
+  ) %>%
   rename(
     Reproducible = typically_reproducible,
     Trustworthy = typically_trustworthy
@@ -277,8 +287,9 @@ typically_plot_data <-
 typically_plot_data <- likert(typically_plot_data)
 
 # Create figure
-typically_plot <- 
+typically_plot <-
   plot(typically_plot_data, digits = 1, ordered = FALSE, legend.position = "right", text.size = 5) +
+  scale_y_continuous(labels = c("100%", "50%", "0%", "50%", "100%"), limits = c(-105, 105)) +
   labs(title = "Typically, studies that analyze preexisting observational datasets\n(such as the ALSPAC dataset) are...") +
   theme(
     title = element_text(size = 14),
@@ -292,27 +303,27 @@ typically_plot <-
 # Create ecaw trustworthy and reproducible plot
 # Calculate missing responses
 ecaw_missing_text <-
-  processed %>% 
-  select(contains("ecaw_")) %>% 
+  processed %>%
+  select(contains("ecaw_")) %>%
   pivot_longer(
     cols = everything(),
     names_to = "item",
     values_to = "value"
-    ) %>% 
-  dplyr::filter(is.na(value) | value == "I don't understand the question") %>% 
-  mutate(item = str_to_title(str_remove(item , "^[^_]*_"))) %>% 
-  replace_na(list(value = "Missing")) %>% 
-  group_by(item , value) %>% 
+  ) %>%
+  dplyr::filter(is.na(value) | value == "I don't understand the question") %>%
+  mutate(item = str_to_title(str_remove(item, "^[^_]*_"))) %>%
+  replace_na(list(value = "Missing")) %>%
+  group_by(item, value) %>%
   summarise(
     n = n()
-  ) %>% 
-  ungroup() %>% 
+  ) %>%
+  ungroup() %>%
   mutate(text = paste(value, "=", n))
 
 # Prepare plot data
-ecaw_plot_data <- 
+ecaw_plot_data <-
   processed %>%
-  select(contains("ecaw_")) %>% 
+  select(contains("ecaw_")) %>%
   # Transform not wanted response values to NA
   # likert::likert drops NA values silently
   # When var transformed to factor these values would be transformed to NA
@@ -325,16 +336,18 @@ ecaw_plot_data <-
         TRUE ~ .
       )
     )
-  ) %>% 
+  ) %>%
   mutate(
     across(
-      .fns = ~ factor(., levels =   c(
-          "Much less",
-          "Somewhat less",
-          "About the same",
-          "Somewhat more",
-          "Much more"))
-    )) %>% 
+      .fns = ~ factor(., levels = c(
+        "Much less",
+        "Somewhat less",
+        "About the same",
+        "Somewhat more",
+        "Much more"
+      ))
+    )
+  ) %>%
   rename(
     Reproducible = ecaw_reproducible,
     Trustworthy = ecaw_trustworthy
@@ -344,18 +357,18 @@ ecaw_plot_data <-
 ecaw_plot_data <- likert(ecaw_plot_data)
 
 # Create figure
-ecaw_plot <- 
+ecaw_plot <-
   plot(ecaw_plot_data, digits = 1, ordered = FALSE, legend.position = "right", text.size = 5) +
+  scale_y_continuous(labels = c("100%", "50%", "0%", "50%", "100%"), limits = c(-105, 105)) +
   labs(title = "Compared to a typical study using preexisting observational data,\na study using an ECAW would be...") +
   theme(
     title = element_text(size = 14),
     axis.text.y = element_text(size = 14),
     axis.text.x = element_text(size = 15),
-    axis.title.x = element_text(size = 15),
+    axis.title.x = element_blank(),
     legend.text = element_text(size = 13.5),
     legend.title = element_blank(),
-    # legend.box.spacing = unit(0, "cm")
-    legend.box.margin = margin(t = 0, r = 0, b = 0, l = -2, unit = "cm")
+    legend.box.margin = margin(t = 0, r = 0, b = 0, l = -2.3, unit = "cm")
   )
 
 # Join the two plots together to make one figure
@@ -364,7 +377,7 @@ typically_plot + ecaw_plot + plot_layout(ncol = 1, nrow = 2)
 
 Respondents generally agreed that studies that analyze preexisting observational datasets are trustworthy[^3] (`r pull(filter(typically_trustworthy, support == "positive"), percentage)`%) and reproducible[^4] (`r pull(filter(typically_reproducible, support == "positive"), percentage)`%) (Figure 1A). At the same time, many agreed that a study using an ECAW would be _more_ trustworthy (`r pull(filter(ecaw_trustworthy, support == "positive"), percentage)`%) and _more_ reproducible (`r pull(filter(ecaw_reproducible, support == "positive"), percentage)`%) compared to a typical study using preexisting observational data (Figure 1B).
 
-```{r include=FALSE}
+```{r methodDescriptives, include=FALSE}
 confirmatory <- level_percentage(
   processed,
   method_confirmatory,
@@ -373,11 +386,12 @@ confirmatory <- level_percentage(
     "Sometimes",
     "About half the time",
     "Most of the time",
-    "Always or almost always"),
+    "Always or almost always"
+  ),
   "I don't understand the question"
-  ) %>% 
-  filter(method_confirmatory != "Never or almost never") %>% 
-  summarise(sum_percentage = sum(percentage)) %>% 
+) %>%
+  filter(method_confirmatory != "Never or almost never") %>%
+  summarise(sum_percentage = sum(percentage)) %>%
   pull(sum_percentage)
 
 exploratory <- level_percentage(
@@ -388,11 +402,12 @@ exploratory <- level_percentage(
     "Sometimes",
     "About half the time",
     "Most of the time",
-    "Always or almost always"),
+    "Always or almost always"
+  ),
   "I don't understand the question"
-  ) %>% 
-  dplyr::filter(method_exploratory != "Never or almost never") %>% 
-  summarise(sum_percentage = sum(percentage)) %>% 
+) %>%
+  dplyr::filter(method_exploratory != "Never or almost never") %>%
+  summarise(sum_percentage = sum(percentage)) %>%
   pull(sum_percentage)
 
 preregistered <- level_percentage(
@@ -403,9 +418,10 @@ preregistered <- level_percentage(
     "Sometimes",
     "About half the time",
     "Most of the time",
-    "Always or almost always"),
+    "Always or almost always"
+  ),
   "I don't understand the question"
-  )
+)
 
 blind <- level_percentage(
   processed,
@@ -415,9 +431,10 @@ blind <- level_percentage(
     "Sometimes",
     "About half the time",
     "Most of the time",
-    "Always or almost always"),
+    "Always or almost always"
+  ),
   "I don't understand the question"
-  )
+)
 
 script <- level_percentage(
   processed,
@@ -427,74 +444,75 @@ script <- level_percentage(
     "Sometimes",
     "About half the time",
     "Most of the time",
-    "Always or almost always"),
+    "Always or almost always"
+  ),
   "I don't understand the question"
-  )
+)
 ```
 
 Over half of respondents reported that their studies using preexisting observational data are preregistered never or almost never (`r filter(preregistered, method_preregistered == "Never or almost never") %>% pull(percentage)`%), or sometimes (`r filter(preregistered, method_preregistered == "Sometimes") %>% pull(percentage)`%) (Figure 2A). About half reported sharing their analysis scripts never or almost never (`r filter(script, method_script == "Never or almost never") %>% pull(percentage)`%), or sometimes (`r filter(script, method_script == "Sometimes") %>% pull(percentage)`%) (Figure 2B). `r filter(blind, method_blind == "Never or almost never") %>% pull(percentage)`% reported that they never or almost never blind the data analyst (Figure 2C). Almost all respondents answered that they use both exploratory (`r exploratory`%) and confirmatory (`r confirmatory`%) analyses at least sometimes (Figure 2D-E).
 
-```{r methodPlot, warning=FALSE, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=11, fig.height=4.5}
+```{r methodPlot, warning=FALSE, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=11, fig.height=4.5, fig.path='figs/', dev=c('png', 'pdf')}
 # Used methods figures
 method_plot_data <-
-  processed %>% 
-    select(starts_with("method_")) %>% 
-    pivot_longer(
-      cols = everything(),
-      names_to = "variable",
-      values_to = "scale",
-    ) %>%
-    separate(variable, into = c("name_prefix", "type")) %>% 
-    group_by(type) %>% 
-    count(scale) %>% 
-  ungroup() %>% 
-    replace_na(list(scale = "Missing")) %>% 
-    mutate(
-      scale = factor(scale, levels = c(
-          "Never or almost never",
-          "Sometimes",
-          "About half the time",
-          "Most of the time",
-          "Always or almost always",
-          "Missing",
-          "I don't understand the question")
-            ),
-      type = case_when(
-        type == "blind" ~ "Blind the\ndata analyst",
-        type == "confirmatory" ~ "Contain\nconfirmatory analysis",
-        type == "exploratory" ~ "Contain\nexploratory analysis",
-        type == "preregistered" ~ "Are preregistered",
-        type == "script" ~ "Share analysis scripts",
-      ),
-      type = factor(type, levels = c(
-        "Contain\nexploratory analysis",
-        "Contain\nconfirmatory analysis",
-        "Blind the\ndata analyst",
-        "Share analysis scripts",
-        "Are preregistered"
-      ))
-      ) %>% 
+  processed %>%
+  select(starts_with("method_")) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "variable",
+    values_to = "scale",
+  ) %>%
+  separate(variable, into = c("name_prefix", "type")) %>%
   group_by(type) %>%
-  tidyr::complete(scale, fill = list(n = 0)) %>% 
+  count(scale) %>%
+  ungroup() %>%
+  replace_na(list(scale = "Missing")) %>%
+  mutate(
+    scale = factor(scale, levels = c(
+      "Never or almost never",
+      "Sometimes",
+      "About half the time",
+      "Most of the time",
+      "Always or almost always",
+      "Missing",
+      "I don't understand the question"
+    )),
+    type = case_when(
+      type == "blind" ~ "Blind the data analyst",
+      type == "confirmatory" ~ "Contain confirmatory analysis",
+      type == "exploratory" ~ "Contain exploratory analysis",
+      type == "preregistered" ~ "Are preregistered",
+      type == "script" ~ "Share analysis scripts",
+    ),
+    type = factor(type, levels = c(
+      "Contain exploratory analysis",
+      "Contain confirmatory analysis",
+      "Blind the data analyst",
+      "Share analysis scripts",
+      "Are preregistered"
+    ))
+  ) %>%
+  group_by(type) %>%
+  tidyr::complete(scale, fill = list(n = 0)) %>%
   mutate(
     percentage = n / sum(n)
-  ) %>% 
+  ) %>%
   ungroup()
 
 # method_missing_data <-
-#   method_data %>% 
-#   filter(scale %in% c("Missing", "I don't understand the question")) %>% 
+#   method_data %>%
+#   filter(scale %in% c("Missing", "I don't understand the question")) %>%
 #   mutate(
 #     scale = case_when(
 #       scale == "I don't understand the question" ~ "Don't understand",
 #       scale == "Missing" ~ "Missing"),
 #     text = paste0(scale, ": ", n)
-#     ) %>% 
-#   group_by(type) %>% 
+#     ) %>%
+#   group_by(type) %>%
 #   summarise(text = stringr::str_c(text, collapse = "\n"))
 
-method_plot_data %>% 
-  # filter(scale %ni% c("Missing", "I don't understand the question")) %>% 
+method_plot_data %>%
+  # filter(scale %ni% c("Missing", "I don't understand the question")) %>%
   ggplot() +
   aes(
     x = percentage,
@@ -507,24 +525,23 @@ method_plot_data %>%
     labels = scales::label_percent()
   ) +
   scale_fill_viridis(option = "A", discrete = TRUE) +
+  scale_y_discrete(labels = function(x) str_wrap(x, width = 20)) +
   labs(
-    x = "Percentage",
-    fill = "Response",
     title = "The studies using preexisting observational data that I am involved in..."
   ) +
   papaja::theme_apa() +
   theme(
     title = element_text(size = 17),
-    axis.title.y = element_blank(),
     axis.text = element_text(size = 15),
-    axis.title.x = element_text(size = 17),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
     legend.text = element_text(size = 14),
     legend.title = element_blank(),
     legend.box.margin = margin(t = 0, r = 0, b = 0, l = -0.5, unit = "cm")
-  ) 
+  )
 ```
 
-```{r include=FALSE, warning=FALSE, message=FALSE}
+```{r aslpacDescriptives, include=FALSE, warning=FALSE, message=FALSE}
 willing <- support_percentage(
   processed,
   alspac_less_willing,
@@ -533,12 +550,13 @@ willing <- support_percentage(
     "Somewhat disagree",
     "Neither agree nor disagree",
     "Somewhat agree",
-    "Strongly agree"),
+    "Strongly agree"
+  ),
   c(
     "I don't understand the question",
     "Unsure"
-    )
   )
+)
 
 opt <- support_percentage(
   processed,
@@ -548,12 +566,13 @@ opt <- support_percentage(
     "Somewhat disagree",
     "Neither agree nor disagree",
     "Somewhat agree",
-    "Strongly agree"),
+    "Strongly agree"
+  ),
   c(
     "I don't understand the question",
     "Unsure"
-    )
   )
+)
 
 study <- support_percentage(
   processed,
@@ -563,12 +582,13 @@ study <- support_percentage(
     "Somewhat disagree",
     "Neither agree nor disagree",
     "Somewhat agree",
-    "Strongly agree"),
+    "Strongly agree"
+  ),
   c(
     "I don't understand the question",
     "Unsure"
-    )
   )
+)
 
 prefer <- support_percentage(
   processed,
@@ -578,40 +598,41 @@ prefer <- support_percentage(
     "Somewhat disagree",
     "Neither agree nor disagree",
     "Somewhat agree",
-    "Strongly agree"),
+    "Strongly agree"
+  ),
   c(
     "I don't understand the question",
     "Unsure"
-    )
   )
+)
 ```
 
 `r pull(filter(willing, support == "positive"), percentage)`% of respondents agreed (versus `r pull(filter(willing, support == "negative"), percentage)`% who disagreed) that they would be less willing to use ALSPAC data if they were required to use an ECAW (Figure 3). `r pull(filter(opt, support == "positive"), percentage)`% agreed (`r pull(filter(opt, support == "negative"), percentage)`% disagreed) that they would opt-in if ALSPAC ran a study on ECAWs. `r pull(filter(study, support == "positive"), percentage)`% agreed (`r pull(filter(study, support == "negative"), percentage)`% disagreed) that ALSPAC should run a study on ECAWs. `r pull(filter(prefer, support == "positive"), percentage)`% agreed (`r pull(filter(prefer, support == "negative"), percentage)`% disagreed) that they would prefer using an ECAW than using typical preregistration.
 
-```{r alspacPlot, warning=FALSE, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=14, fig.height=4, message=FALSE}
+```{r alspacPlot, warning=FALSE, message=FALSE, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=14, fig.height=5, fig.path='figs/', dev=c('png', 'pdf')}
 # Check if there is any missing and don't understand responses separately
 alspac_missing_text <-
-  processed %>% 
-  select(contains("alspac_")) %>% 
+  processed %>%
+  select(contains("alspac_")) %>%
   pivot_longer(
     cols = everything(),
     names_to = "item",
     values_to = "value"
-    ) %>% 
-  dplyr::filter(is.na(value) | value == "I don't understand the question" | value == "Unsure") %>% 
-  mutate(item = str_to_title(str_remove(item , "^[^_]*_"))) %>% 
-  replace_na(list(value = "Missing")) %>% 
-  group_by(item , value) %>% 
+  ) %>%
+  dplyr::filter(is.na(value) | value == "I don't understand the question" | value == "Unsure") %>%
+  mutate(item = str_to_title(str_remove(item, "^[^_]*_"))) %>%
+  replace_na(list(value = "Missing")) %>%
+  group_by(item, value) %>%
   summarise(
     n = n()
-  ) %>% 
-  ungroup() %>% 
+  ) %>%
+  ungroup() %>%
   mutate(text = paste(value, "=", n))
 
 # Prepare plot data
-alspac_plot_data <- 
+alspac_plot_data <-
   processed %>%
-  select(contains("alspac_")) %>% 
+  select(contains("alspac_")) %>%
   # Transform not wanted response values to NA
   # likert::likert drops NA values silently
   # When var transformed to factor these values would be transformed to NA
@@ -624,18 +645,18 @@ alspac_plot_data <-
         TRUE ~ .
       )
     )
-  ) %>% 
+  ) %>%
   mutate(
     across(
       .fns = ~ factor(., levels = c(
-          "Strongly disagree",
-          "Somewhat disagree",
-          "Neither agree nor disagree",
-          "Somewhat agree",
-          "Strongly agree")
-          )
-      )
-    ) %>% 
+        "Strongly disagree",
+        "Somewhat disagree",
+        "Neither agree nor disagree",
+        "Somewhat agree",
+        "Strongly agree"
+      ))
+    )
+  ) %>%
   rename(
     `If ALSPAC required that I use an ECAW, I would be less willing to use their data in my research` = alspac_less_willing,
     `If ALSPAC ran a study on ECAWs, I would opt-in.` = alspac_opt_in,
@@ -647,14 +668,17 @@ alspac_plot_data <-
 alspac_plot_likert_data <- likert(alspac_plot_data)
 
 # Create figure
-plot(alspac_plot_likert_data, digits = 1, ordered = TRUE, group.order = names(alspac_plot_data), text.size = 6) +
+plot(alspac_plot_likert_data, digits = 1, ordered = TRUE, text.size = 6) +
+  # TODO: have to check if this is not messing with the results
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 30), limits = rev(names(alspac_plot_data))) +
+  scale_y_continuous(labels = c("100%", "50%", "0%", "50%", "100%"), limits = c(-105, 105)) +
   labs(title = "Thinking about a study you may run with ALSPAC data (or one that you have recently run)...") +
   theme(
-    title = element_text(size = 14),
-    axis.text.y = element_text(size = 13),
-    axis.text.x = element_text(size = 15),
-    axis.title.x = element_text(size = 15),
-    legend.text = element_text(size = 13),
+    axis.title.x = element_blank(),
+    title = element_text(size = 15.5),
+    axis.text.y = element_text(size = 14),
+    axis.text.x = element_text(size = 16),
+    legend.text = element_text(size = 15),
     legend.title = element_blank()
   )
 ```
@@ -662,9 +686,9 @@ plot(alspac_plot_likert_data, digits = 1, ordered = TRUE, group.order = names(al
 ```{r include=FALSE}
 # Open ended questions
 open_ended <-
-  processed %>% 
-  select(response_id, unsure_explain, drawback_ecaw, suggestions, comments) %>% 
-  pivot_longer(cols = c(unsure_explain, drawback_ecaw, suggestions, comments), names_to = "variable", values_to = "value") %>% 
+  processed %>%
+  select(response_id, unsure_explain, drawback_ecaw, suggestions, comments) %>%
+  pivot_longer(cols = c(unsure_explain, drawback_ecaw, suggestions, comments), names_to = "variable", values_to = "value") %>%
   filter(!is.na(value))
 ```
 

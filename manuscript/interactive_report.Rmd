@@ -38,12 +38,12 @@ inputPanel(
               min = min(processed$n_studies, na.rm = T),
               max = max(processed$n_studies, na.rm = T), value = c(0, max(processed$n_studies, na.rm = T)), step = 1),
   selectInput("methods", label = "Used the following methods:",
-              choices = c(
-                "Blind" = "method_blind",
-                "Script" = "method_script",
-                "Preregistration" = "method_preregistered",
-                "Confirmatory" = "method_confirmatory", 
-                "Exploratory" = "method_exploratory"),
+              choices = list(
+                "Blind" = list("Never or almost never", "Sometimes", "About half the time", "Most of the time", "Always or almost always", "Missing", "I don't understand the question"),
+                "Script" = list("Never or almost never", "Sometimes", "About half the time", "Most of the time", "Always or almost always", "Missing", "I don't understand the question"),
+                "Preregistration" = list("Never or almost never", "Sometimes", "About half the time", "Most of the time", "Always or almost always", "Missing", "I don't understand the question"),
+                "Confirmatory" = list("Never or almost never", "Sometimes", "About half the time", "Most of the time", "Always or almost always", "Missing", "I don't understand the question"), 
+                "Exploratory" = list("Never or almost never", "Sometimes", "About half the time", "Most of the time", "Always or almost always", "Missing", "I don't understand the question")),
               selected = NULL, multiple = TRUE),
   selectInput("concerned", label = "Level of concern with rigour and reproducibility:",
               choices = c(
@@ -85,6 +85,13 @@ inputPanel(
 
 # Filter data
 filtered_data <- reactive({
+  # list(
+  #               "Blind" = "method_blind",
+  #               "Script" = "method_script",
+  #               "Preregistration" = "method_preregistered",
+  #               "Confirmatory" = "method_confirmatory", 
+  #               "Exploratory" = "method_exploratory")
+  # 
   concerned_options <-list(
     "Less concerned" =  c("very much less concerned", "less concerned", "somewhat less concerned"),
     "Neutral" =  c("as concerned as a typical researcher in my field"),
@@ -95,13 +102,13 @@ filtered_data <- reactive({
   
   processed %>% 
     filter(n_studies >= input$n_studies[1] & n_studies <= input$n_studies[2] | is.na(n_studies)) %>% 
-    filter(if_all(input$methods, ~ . != "Never or almost never")) %>% 
+    # filter(if_all(input$methods, ~ . != "Never or almost never")) %>% 
     filter(concerned %in% concerned_filter | is.na(concerned)) %>% 
     filter(str_detect(programming_language, paste(input$language, collapse="|")) | is.na(programming_language))
   })
 # select(filtered_data(), concerned)
 # shiny::renderTable(filtered_data())
-shiny::renderText({nrow(filtered_data())})
+shiny::renderText({input$methods})
 ```
 
 # Results from the manuscript
@@ -368,7 +375,7 @@ filtered_data() %>%
 ```{r echo=FALSE}
 # Concerned figure data preparation
 concerned_plot_data <- reactive({
-  processed %>% 
+  filtered_data() %>% 
   select(concerned) %>% 
   mutate(
     concerned = tolower(concerned),
