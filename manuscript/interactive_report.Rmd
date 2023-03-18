@@ -1,7 +1,5 @@
 ---
 title: "Results exploration"
-author: "Marton Kovacs"
-date: "`r Sys.Date()`"
 output: html_document
 runtime: shiny
 ---
@@ -18,6 +16,7 @@ library(likert)
 library(viridis)
 library(shiny)
 library(plotly)
+library(DT)
 # r_refs("references.bib")
 
 # Source R scripts
@@ -28,87 +27,124 @@ purrr::walk(r_scripts, source)
 processed <- read_csv(here("data/processed/ecaw_processed_data.csv"))
 ```
 
+The aim of this document is to allow users to interactively explore the descriptive results of the study titled _"A survey of registration practices among observational researchers using preexisting datasets"_.
+
 # Settings
 
-Subset data for all the results.
+By using these filters you can subset the dataset for all the results presented in this report. The full dataset only contains the responses of those participants who finished the survey (n = `r nrow(processed)`).
 
 ```{r, echo=FALSE}
+# Create a panel for the settings
 inputPanel(
+  # Filter by the number of studies
   sliderInput("n_studies", label = "Number of studies using ALSPAC:",
               min = min(processed$n_studies, na.rm = T),
               max = max(processed$n_studies, na.rm = T), value = c(0, max(processed$n_studies, na.rm = T)), step = 1),
-  selectInput("methods", label = "Used the following methods:",
-              choices = list(
-                "Blind" = list("Never or almost never", "Sometimes", "About half the time", "Most of the time", "Always or almost always", "Missing", "I don't understand the question"),
-                "Script" = list("Never or almost never", "Sometimes", "About half the time", "Most of the time", "Always or almost always", "Missing", "I don't understand the question"),
-                "Preregistration" = list("Never or almost never", "Sometimes", "About half the time", "Most of the time", "Always or almost always", "Missing", "I don't understand the question"),
-                "Confirmatory" = list("Never or almost never", "Sometimes", "About half the time", "Most of the time", "Always or almost always", "Missing", "I don't understand the question"), 
-                "Exploratory" = list("Never or almost never", "Sometimes", "About half the time", "Most of the time", "Always or almost always", "Missing", "I don't understand the question")),
-              selected = NULL, multiple = TRUE),
+  # Filter by how concerned the respondent is with rigour and reproducibility
+  # TODO: The last level was recorded with a capital letter, needs to be changed because it is a major source of error
   selectInput("concerned", label = "Level of concern with rigour and reproducibility:",
-              choices = c(
-                "Less concerned",
-                "Neutral",
-                "More concerned"),
-              selected = c(
-                "Less concerned",
-                "Neutral",
-                "More concerned"), multiple = TRUE),
+              choices = c("very much less concerned", "less concerned", "somewhat less concerned", "as concerned as a typical researcher in my field", "somewhat more concerned", "more concerned", "Very much more concerned", "missing"),
+              selected = c("very much less concerned", "less concerned", "somewhat less concerned", "as concerned as a typical researcher in my field", "somewhat more concerned", "more concerned", "Very much more concerned", "missing"),
+              multiple = TRUE),
+  # Filter by programming language used for the analysis
   selectInput("language", label = "Programming language used for the analysis:",
-              choices = c(
-                "R",
-                "Stata",
-                "SPSS",
-                "SAS",
-                "Python",
-                "Mplus",
-                "Bash",
-                "MATLAB",
-                "Nextflow",
-                "plink2",
-                "irrelevant"
-              ),
-              selected = c(
-                "R",
-                "Stata",
-                "SPSS",
-                "SAS",
-                "Python",
-                "Mplus",
-                "Bash",
-                "MATLAB",
-                "Nextflow",
-                "plink2",
-                "irrelevant"
-              ), multiple = TRUE)
+              choices = c("R", "Stata", "SPSS", "SAS", "Python", "Mplus", "Bash", "MATLAB", "Nextflow", "plink2", "irrelevant"),
+              selected = c("R", "Stata", "SPSS", "SAS", "Python", "Mplus", "Bash", "MATLAB", "Nextflow", "plink2", "irrelevant"),
+              multiple = TRUE),
+  br(),
+  # Filtered by the methods used by the respondents
+  ## BLinded analysis
+  selectInput("blinded", label = "Blinded data analyst",
+              choices = c("Never or almost never", "Sometimes", "About half the time", "Most of the time", "Always or almost always", "Missing", "I don't understand the question"),
+              selected = c("Never or almost never", "Sometimes", "About half the time", "Most of the time", "Always or almost always", "Missing", "I don't understand the question"),
+              multiple = TRUE),
+  ## Preregistration
+  selectInput("prereg", label = "Preregistration",
+              choices = c("Never or almost never", "Sometimes", "About half the time", "Most of the time", "Always or almost always", "Missing", "I don't understand the question"),
+              selected = c("Never or almost never", "Sometimes", "About half the time", "Most of the time", "Always or almost always", "Missing", "I don't understand the question"),
+              multiple = TRUE),
+  ## Script
+  selectInput("script", label = "Analysis script",
+              choices = c("Never or almost never", "Sometimes", "About half the time", "Most of the time", "Always or almost always", "Missing", "I don't understand the question"),
+              selected = c("Never or almost never", "Sometimes", "About half the time", "Most of the time", "Always or almost always", "Missing", "I don't understand the question"),
+              multiple = TRUE),
+  ## Confirmatory analysis
+  selectInput("confirmatory", label = "Confirmatory analysis",
+              choices = c("Never or almost never", "Sometimes", "About half the time", "Most of the time", "Always or almost always", "Missing", "I don't understand the question"),
+              selected = c("Never or almost never", "Sometimes", "About half the time", "Most of the time", "Always or almost always", "Missing", "I don't understand the question"),
+              multiple = TRUE),
+  ## Exploratory analysis
+  selectInput("exploratory", label = "Exploratory analysis",
+              choices = c("Never or almost never", "Sometimes", "About half the time", "Most of the time", "Always or almost always", "Missing", "I don't understand the question"),
+              selected = c("Never or almost never", "Sometimes", "About half the time", "Most of the time", "Always or almost always", "Missing", "I don't understand the question"),
+              multiple = TRUE)
   )
 
-# Filter data
+# Filter data based on the settings
 filtered_data <- reactive({
-  # list(
-  #               "Blind" = "method_blind",
-  #               "Script" = "method_script",
-  #               "Preregistration" = "method_preregistered",
-  #               "Confirmatory" = "method_confirmatory", 
-  #               "Exploratory" = "method_exploratory")
-  # 
-  concerned_options <-list(
-    "Less concerned" =  c("very much less concerned", "less concerned", "somewhat less concerned"),
-    "Neutral" =  c("as concerned as a typical researcher in my field"),
-    "More concerned" = c("somewhat more concerned", "more concerned", "Very much more concerned")
-  )
+  # Create a filter for concerned and methods that only includes response levels
+  # TODO: Not the most elegant solution...
+  concerned_filter <- input$concerned[input$concerned != "missing"]
+  blinded_filter <- input$blinded[input$blinded != "Missing"]
+  prereg_filter <- input$prereg[input$prereg != "Missing"]
+  script_filter <- input$script[input$script != "Missing"]
+  confirmatory_filter <- input$confirmatory[input$confirmatory != "Missing"]
+  exploratory_filter <- input$exploratory[input$exploratory != "Missing"]
   
-  concerned_filter <- unlist(concerned_options[input$concerned], use.names = FALSE)
-  
-  processed %>% 
+  res <-
+    processed %>% 
     filter(n_studies >= input$n_studies[1] & n_studies <= input$n_studies[2] | is.na(n_studies)) %>% 
-    # filter(if_all(input$methods, ~ . != "Never or almost never")) %>% 
+    # Filter concerned by response levels and keep all missing responses for now
     filter(concerned %in% concerned_filter | is.na(concerned)) %>% 
+    # Filter methods by levels and keep all missing responses for now
+    filter(method_blind %in% blinded_filter | is.na(method_blind)) %>% 
+    filter(method_preregistered %in% prereg_filter | is.na(method_preregistered)) %>% 
+    filter(method_script %in% script_filter | is.na(method_script)) %>% 
+    filter(method_confirmatory %in% confirmatory_filter | is.na(method_confirmatory)) %>% 
+    filter(method_exploratory %in% exploratory_filter | is.na(method_exploratory)) %>% 
     filter(str_detect(programming_language, paste(input$language, collapse="|")) | is.na(programming_language))
+    
+  # Filter missing responses from concerned and method if specified
+  # TODO: Not the most elegant solution...
+  if ("missing" %ni% input$concerned) res <- dplyr::filter(res, !is.na(concerned))
+  if ("Missing" %ni% input$blinded) res <- dplyr::filter(res, !is.na(method_blind))
+  if ("Missing" %ni% input$prereg) res <- dplyr::filter(res, !is.na(method_preregistered))
+  if ("Missing" %ni% input$script) res <- dplyr::filter(res, !is.na(method_script))
+  if ("Missing" %ni% input$confirmatory) res <- dplyr::filter(res, !is.na(method_confirmatory))
+  if ("Missing" %ni% input$exploratory) res <- dplyr::filter(res, !is.na(method_exploratory))
+  
+  # Return filtered data
+  return(res)
   })
-# select(filtered_data(), concerned)
-# shiny::renderTable(filtered_data())
-shiny::renderText({input$methods})
+```
+
+# Dataset
+
+```{r echo=FALSE}
+# Get the index of open ended question for condensing the long text
+condensed_cols <- which(colnames(processed) %in% c("unsure_explain", "drawback_ecaw", "suggestions", "comments", "contact")) - 1
+
+# Render the dataset as a pretty table
+DT::renderDataTable(filtered_data(), rownames = FALSE, options = list(
+  pageLength = 5,
+  lengthMenu = c(5, 10, 15, 20),
+  scrollX = TRUE,
+  autoWidth = TRUE,
+  columnDefs = list(
+    list(
+      className = "dt-center", targets = 0
+    ),
+    list(
+      targets = condensed_cols,
+      render = htmlwidgets::JS(
+        "function(data, type, row, meta) {",
+        "return type === 'display' && data != null && data.length > 25 ?",
+        "'<span title=\"' + data + '\">' + data.substr(0, 25) + '...</span>' : data;",
+        "}"
+      )
+    )
+  )
+))
 ```
 
 # Results from the manuscript
@@ -120,59 +156,72 @@ typically_plot_data <- reactive({
   filtered_data() %>%
     select(contains("typically_")) %>%
     mutate(
-    across(
-      .fns = ~ factor(., levels =   c(
-    "Strongly disagree",
-    "Somewhat disagree",
-    "Neither agree nor disagree",
-    "Somewhat agree",
-    "Strongly agree"))
-    )) %>%
+      across(
+        .fns = ~ factor(., levels = c(
+          "Strongly disagree",
+          "Somewhat disagree",
+          "Neither agree nor disagree",
+          "Somewhat agree",
+          "Strongly agree"
+        ))
+      )
+    ) %>%
     rename(
       Reproducible = typically_reproducible,
       Trustworthy = typically_trustworthy
-      ) %>%
+    ) %>%
     # Create likert package data not including the missing values
     likert(.)
 })
 
 # Create figure
 typically_plot <- reactive({
-  plot(typically_plot_data(), digits = 1, ordered = FALSE, legend.position = "right") +
-  labs(title = "Typically, studies that analyze preexisting observational datasets (such as the ALSPAC dataset) are...")
+  plot(typically_plot_data(), digits = 1, ordered = FALSE, legend.position = "right", text.size = 4.5) +
+    scale_y_continuous(labels = c("100%", "50%", "0%", "50%", "100%"), limits = c(-105, 105)) +
+    labs(title = str_wrap("Typically, studies that analyze preexisting observational datasets (such as the ALSPAC dataset) are...", width = 50)) +
+    theme(
+      title = element_text(size = 14),
+      axis.text.y = element_text(size = 14),
+      axis.text.x = element_text(size = 15),
+      axis.title.x = element_blank(),
+      legend.text = element_text(size = 13.5),
+      legend.title = element_blank()
+    )
 })
 
 # Create ecaw trustworthy and reproducible plot
 # Prepare plot data
 ecaw_plot_data <- reactive({
   filtered_data() %>%
-  select(contains("ecaw_")) %>%
-  # Transform not wanted response values to NA
-  # likert::likert drops NA values silently
-  # When var transformed to factor these values would be transformed to NA
-  # Automatically but I try to be explicit
-  mutate(
-    across(
-      everything(),
-      ~ case_when(
-        . == "I don't understand the question" ~ NA_character_,
-        TRUE ~ .
+    select(contains("ecaw_")) %>%
+    # Transform not wanted response values to NA
+    # likert::likert drops NA values silently
+    # When var transformed to factor these values would be transformed to NA
+    # Automatically but I try to be explicit
+    mutate(
+      across(
+        everything(),
+        ~ case_when(
+          . == "I don't understand the question" ~ NA_character_,
+          TRUE ~ .
+        )
       )
-    )
-  ) %>%
-  mutate(
-    across(
-      .fns = ~ factor(., levels =   c(
+    ) %>%
+    mutate(
+      across(
+        .fns = ~ factor(., levels = c(
           "Much less",
           "Somewhat less",
           "About the same",
           "Somewhat more",
-          "Much more"))
-    )) %>%
-  rename(
-    Reproducible = ecaw_reproducible,
-    Trustworthy = ecaw_trustworthy
-  ) %>%
+          "Much more"
+        ))
+      )
+    ) %>%
+    rename(
+      Reproducible = ecaw_reproducible,
+      Trustworthy = ecaw_trustworthy
+    ) %>%
     # Create likert package data not including the missing values
     likert(.)
 })
@@ -180,12 +229,24 @@ ecaw_plot_data <- reactive({
 
 # Create figure
 ecaw_plot <- reactive({
-  plot(ecaw_plot_data(), digits = 1, ordered = FALSE, legend.position = "right") +
-  labs(title = "Compared to a typical study using preexisting observational data, a study using an ECAW would be...")
+  plot(ecaw_plot_data(), digits = 1, ordered = FALSE, legend.position = "right", text.size = 4.5) +
+    scale_y_continuous(labels = c("100%", "50%", "0%", "50%", "100%"), limits = c(-105, 105)) +
+    labs(title = str_wrap("Compared to a typical study using preexisting observational data, a study using an ECAW would be...", width = 50)) +
+    theme(
+      title = element_text(size = 14),
+      axis.text.y = element_text(size = 14),
+      axis.text.x = element_text(size = 15),
+      axis.title.x = element_blank(),
+      legend.text = element_text(size = 13.5),
+      legend.title = element_blank(),
+      legend.box.margin = margin(t = 0, r = 0, b = 0, l = -2.3, unit = "cm")
+    )
 })
 
 # Join the two plots together to make one figure
-renderPlot({ typically_plot() + ecaw_plot() + plot_layout(ncol = 1, nrow = 2) })
+renderPlot({
+  typically_plot() + ecaw_plot() + plot_layout(ncol = 1, nrow = 2)
+})
 ```
 
 ---
@@ -193,28 +254,28 @@ renderPlot({ typically_plot() + ecaw_plot() + plot_layout(ncol = 1, nrow = 2) })
 ```{r echo=FALSE}
 # Used methods figures
 method_plot_data <- reactive({
-  filtered_data() %>% 
-    select(starts_with("method_")) %>% 
+  filtered_data() %>%
+    select(starts_with("method_")) %>%
     pivot_longer(
       cols = everything(),
       names_to = "variable",
       values_to = "scale",
     ) %>%
-    separate(variable, into = c("name_prefix", "type")) %>% 
-    group_by(type) %>% 
-    count(scale) %>% 
-  ungroup() %>% 
-    replace_na(list(scale = "Missing")) %>% 
+    separate(variable, into = c("name_prefix", "type")) %>%
+    group_by(type) %>%
+    count(scale) %>%
+    ungroup() %>%
+    replace_na(list(scale = "Missing")) %>%
     mutate(
       scale = factor(scale, levels = c(
-          "Never or almost never",
-          "Sometimes",
-          "About half the time",
-          "Most of the time",
-          "Always or almost always",
-          "Missing",
-          "I don't understand the question")
-            ),
+        "Never or almost never",
+        "Sometimes",
+        "About half the time",
+        "Most of the time",
+        "Always or almost always",
+        "Missing",
+        "I don't understand the question"
+      )),
       type = case_when(
         type == "blind" ~ "Blind the data analyst",
         type == "confirmatory" ~ "Contain confirmatory analysis",
@@ -229,41 +290,46 @@ method_plot_data <- reactive({
         "Share analysis scripts",
         "Are preregistered"
       ))
-      ) %>% 
-  group_by(type) %>%
-  tidyr::complete(scale, fill = list(n = 0)) %>% 
-  mutate(
-    percentage = n / sum(n)
-  ) %>% 
-  ungroup()
+    ) %>%
+    group_by(type) %>%
+    tidyr::complete(scale, fill = list(n = 0)) %>%
+    mutate(
+      percentage = n / sum(n)
+    ) %>%
+    ungroup()
 })
 
 renderPlot({
-method_plot_data() %>% 
-  # filter(scale %ni% c("Missing", "I don't understand the question")) %>% 
-  ggplot() +
-  aes(
-    x = percentage,
-    y = type,
-    fill = scale
-  ) +
-  geom_bar(position = "stack", stat = "identity") +
-  scale_x_continuous(
-    limits = c(0, 1),
-    labels = scales::label_percent()
-  ) +
-  scale_fill_viridis(option = "A", discrete = TRUE) +
-  labs(
-    x = "Percentage",
-    fill = "Response",
-    title = "The studies using preexisting observational data that I am involved in..."
-  ) +
-  papaja::theme_apa() +
-  theme(
-    axis.title.y = element_blank(),
-    legend.text = element_text(size = 12),
-    legend.title = element_blank()
-  ) 
+  method_plot_data() %>%
+    # filter(scale %ni% c("Missing", "I don't understand the question")) %>%
+    ggplot() +
+    aes(
+      x = percentage,
+      y = type,
+      fill = scale
+    ) +
+    geom_bar(position = "stack", stat = "identity") +
+    scale_x_continuous(
+      limits = c(0, 1),
+      labels = scales::label_percent()
+    ) +
+    scale_fill_viridis(option = "A", discrete = TRUE) +
+    scale_y_discrete(labels = function(x) str_wrap(x, width = 20)) +
+    labs(
+      x = "Percentage",
+      fill = "Response",
+      title = "The studies using preexisting observational data that I am involved in..."
+    ) +
+    papaja::theme_apa() +
+    theme(
+      title = element_text(size = 17),
+      axis.text = element_text(size = 15),
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      legend.text = element_text(size = 14),
+      legend.title = element_blank(),
+      legend.box.margin = margin(t = 0, r = 0, b = 0, l = -0.5, unit = "cm")
+    )
 })
 ```
 
@@ -273,54 +339,60 @@ method_plot_data() %>%
 # Prepare plot data
 alspac_plot_data <- reactive({
   filtered_data() %>%
-  select(contains("alspac_")) %>% 
-  # Transform not wanted response values to NA
-  # likert::likert drops NA values silently
-  # When var transformed to factor these values would be transformed to NA
-  # Automatically but I try to be explicit
-  mutate(
-    across(
-      everything(),
-      ~ case_when(
-        . %in% c("I don't understand the question", "Unsure") ~ NA_character_,
-        TRUE ~ .
+    select(contains("alspac_")) %>%
+    # Transform not wanted response values to NA
+    # likert::likert drops NA values silently
+    # When var transformed to factor these values would be transformed to NA
+    # Automatically but I try to be explicit
+    mutate(
+      across(
+        everything(),
+        ~ case_when(
+          . %in% c("I don't understand the question", "Unsure") ~ NA_character_,
+          TRUE ~ .
+        )
       )
-    )
-  ) %>% 
-  mutate(
-    across(
-      .fns = ~ factor(., levels = c(
+    ) %>%
+    mutate(
+      across(
+        .fns = ~ factor(., levels = c(
           "Strongly disagree",
           "Somewhat disagree",
           "Neither agree nor disagree",
           "Somewhat agree",
-          "Strongly agree")
-          )
+          "Strongly agree"
+        ))
       )
-    ) %>% 
-  rename(
-    `If ALSPAC required that I\nuse an ECAW, I would be less willing to\nuse their data in my research` = alspac_less_willing,
-    `If ALSPAC ran a study\non ECAWs, I would opt-in.` = alspac_opt_in,
-    `ALSPAC should run\na study on ECAWs.` = alspac_study,
-    `I would prefer using\nan ECAW than using typical preregistration` = alspac_prefer_ecaw
-  )
+    ) %>%
+    rename(
+      `If ALSPAC required that I use an ECAW, I would be less willing to use their data in my research` = alspac_less_willing,
+      `If ALSPAC ran a study on ECAWs, I would opt-in.` = alspac_opt_in,
+      `ALSPAC should run a study on ECAWs.` = alspac_study,
+      `I would prefer using an ECAW than using typical preregistration` = alspac_prefer_ecaw
+    )
 })
 
 # Create likert package data not including the missing values
-alspac_plot_likert_data <- reactive({likert(alspac_plot_data())})
+alspac_plot_likert_data <- reactive({
+  likert(alspac_plot_data())
+})
 
 # Create figure
 renderPlot({
-  plot(alspac_plot_likert_data(), digits = 1, ordered = TRUE, group.order = names(alspac_plot_data()), text.size = 6) +
-  labs(title = "Thinking about a study you may run with ALSPAC data (or one that you have recently run)...") +
-  theme(
-    title = element_text(size = 14),
-    axis.text.y = element_blank(),
-    axis.text.x = element_text(size = 15),
-    axis.title.x = element_text(size = 15),
-    legend.text = element_text(size = 12),
-    legend.title = element_blank()
-  )
+  plot(alspac_plot_likert_data(), digits = 1, ordered = TRUE, group.order = names(alspac_plot_data()), text.size = 5.5) +
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 25), limits = rev(names(alspac_plot_data))) +
+    labs(title = str_wrap("Thinking about a study you may run with ALSPAC data (or one that you have recently run)..."), width = 25) +
+    theme(
+      axis.title.x = element_blank(),
+      title = element_text(size = 14),
+      axis.text.y = element_text(size = 14),
+      axis.text.x = element_text(size = 16),
+      legend.text = element_text(size = 15),
+      legend.title = element_blank(),
+      plot.margin = margin(t = 0, r = 0, b = 3.5, l = 0, unit = "lines"),
+      legend.position = c(.35,-.2),
+      legend.direction = "horizontal"
+    )
 })
 ```
 
@@ -328,21 +400,26 @@ renderPlot({
 
 ```{r echo=FALSE}
 renderPlot({
-# Create histogram of the number of observational studies done
-filtered_data() %>% 
-  # Exclude missing responses
-  filter(!is.na(n_studies)) %>% 
-  ggplot() +
-  aes(x = n_studies) +
-  geom_histogram(binwidth = 3) +
-  # annotate(geom = "text", x = 200, label = n_studies_missing_text, y = 30) +
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 30)) +
-  labs(
-    x = "Number of studies",
-    y = "Count",
-    title = "Approximately how many studies have you published using a preexisting observational dataset (e.g., the ALSPAC dataset)?"
-  ) +
-  papaja::theme_apa()
+  # Create histogram of the number of observational studies done
+  filtered_data() %>%
+    # Exclude missing responses
+    filter(!is.na(n_studies)) %>%
+    ggplot() +
+    aes(x = n_studies) +
+    geom_histogram(binwidth = 3) +
+    # annotate(geom = "text", x = 200, label = n_studies_missing_text, y = 30) +
+    scale_y_continuous(expand = c(0, 0), limits = c(0, 30)) +
+    labs(
+      x = "Number of studies",
+      y = "Count",
+      title = str_wrap("Approximately how many studies have you published using a preexisting observational dataset (e.g., the ALSPAC dataset)?", width = 70)
+    ) +
+    papaja::theme_apa() +
+    theme(
+      title = element_text(size = 15),
+      axis.text = element_text(size = 15),
+      axis.title = element_text(size = 17)
+    )
 })
 ```
 
@@ -351,22 +428,24 @@ filtered_data() %>%
 ```{r echo=FALSE}
 # Programming languages table
 renderTable({
-filtered_data() %>% 
-  rename(lang = programming_language) %>% 
-  separate_rows(lang, sep = ",") %>% 
-  count(lang) %>% 
-  replace_na(list(lang = "Missing")) %>% 
-  # Removing irrelevant
-  filter(lang != "irrelevant") %>% 
-  ungroup() %>% 
-  mutate(
-    `Percentage of respondents` = round(n / sum(n) * 100, 0)
-  ) %>% 
-  arrange(desc(n)) %>% 
-  rename(
-    `Programming language` = lang,
-    `N` = n
-  )
+  denominator <- nrow(filtered_data())
+  
+  filtered_data() %>%
+    rename(lang = programming_language) %>%
+    separate_rows(lang, sep = ",") %>%
+    count(lang) %>%
+    replace_na(list(lang = "Missing")) %>%
+    # Removing irrelevant
+    filter(lang != "irrelevant") %>%
+    ungroup() %>%
+    mutate(
+      `Percentage of respondents` = round(n / denominator * 100, 2)
+    ) %>%
+    arrange(desc(n)) %>%
+    rename(
+      `Programming language` = lang,
+      `N` = n
+    )
 })
 ```
 
@@ -375,39 +454,41 @@ filtered_data() %>%
 ```{r echo=FALSE}
 # Concerned figure data preparation
 concerned_plot_data <- reactive({
-  filtered_data() %>% 
-  select(concerned) %>% 
-  mutate(
-    concerned = tolower(concerned),
-    concerned = factor(concerned, levels = c(
-      "very much less concerned",
-      "less concerned",
-      "somewhat less concerned",
-      "as concerned as a typical researcher in my field",
-      "somewhat more concerned",
-      "more concerned",
-      "very much more concerned"
-      )
-    )
-  ) %>% 
+  filtered_data() %>%
+    select(concerned) %>%
+    mutate(
+      concerned = tolower(concerned),
+      concerned = factor(concerned, levels = c(
+        "very much less concerned",
+        "less concerned",
+        "somewhat less concerned",
+        "as concerned as a typical researcher in my field",
+        "somewhat more concerned",
+        "more concerned",
+        "very much more concerned"
+      ))
+    ) %>%
     filter(!is.na(concerned))
 })
 
 # Create likert package data not including the missing values
-concerned_likert_plot_data <- reactive({likert(concerned_plot_data())})
+concerned_likert_plot_data <- reactive({
+  likert(concerned_plot_data())
+})
 
 # Create figure
 renderPlot({
   plot(concerned_likert_plot_data(), digits = 1, text.size = 6, group.order = names(concerned_plot_data())) +
-  labs(title = "Compared to what you think of as a typical researcher who uses preexisting observational data in your field,\nhow concerned are you with research trustworthiness, bias, rigour, and reproducibility ...") +
-  theme(
-    title = element_text(size = 14),
-    axis.text.y = element_blank(),
-    axis.text.x = element_text(size = 15),
-    axis.title.x = element_text(size = 15),
-    legend.text = element_text(size = 10),
-    legend.title = element_blank()
-  )
+    scale_y_continuous(labels = c("100%", "50%", "0%", "50%", "100%"), limits = c(-105, 105)) +
+    labs(title = str_wrap("Compared to what you think of as a typical researcher who uses preexisting observational data in your field, how concerned are you with research trustworthiness, bias, rigour, and reproducibility ...", width = 100)) +
+    theme(
+      title = element_text(size = 14),
+      axis.text.y = element_blank(),
+      axis.text.x = element_text(size = 15),
+      axis.title.x = element_blank(),
+      legend.text = element_text(size = 11),
+      legend.title = element_blank()
+    )
 })
 ```
 

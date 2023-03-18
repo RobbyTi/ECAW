@@ -1,6 +1,6 @@
 # Supplementary materials C
 
-```{r numStudies, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=6, fig.height=3.2}
+```{r numStudiesPlot, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=6, fig.height=3.2, fig.path='figs/', dev=c('png', 'pdf')}
 # Create text for missing responses
 n_studies_missing_text <- 
   processed %>% 
@@ -43,7 +43,7 @@ processed %>%
 #   papaja::theme_apa()
 ```
 
-```{r}
+```{r languageTable}
 # Programming languages table
 # We use the number of all participants who responded to the questionnaire as the denominator
 denominator <- nrow(processed)
@@ -80,7 +80,7 @@ processed %>%
 
 (ref:table1c-caption) What programming language or software do you use for your analyses of preexisting observational data?
 
-```{r concerned, warning=FALSE, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=10, fig.height=4}
+```{r concernedPlot, warning=FALSE, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=10, fig.height=4, fig.path='figs/', dev=c('png', 'pdf')}
 # Concerned figure data preparation
 concerned_plot_data <-
   processed %>% 
@@ -120,7 +120,7 @@ concerned_likert_plot_data <- likert(concerned_plot_data)
 # Create figure
 plot(concerned_likert_plot_data, digits = 1, text.size = 6, group.order = names(concerned_plot_data)) +
   scale_y_continuous(labels = c("100%", "50%", "0%", "50%", "100%"), limits = c(-105, 105)) +
-  labs(title = "Compared to what you think of as a typical researcher who uses\npreexisting observational data in your field, how concerned\nare you with research trustworthiness, bias, rigour, and reproducibility ...") +
+  labs(title = str_wrap("Compared to what you think of as a typical researcher who uses preexisting observational data in your field, how concerned are you with research trustworthiness, bias, rigour, and reproducibility ...", width = 100)) +
   theme(
     title = element_text(size = 14),
     axis.text.y = element_blank(),
