@@ -48,6 +48,8 @@ raw <-
   dplyr::filter(finished)
 ```
 
+These responses will be included in an exploratory analysis that will be published in supplementary materials D.
+
 At the end of the exclusion we had `r nrow(raw)` responses remaining for the analysis.
 
 It was optional to answer all of the questions in our survey, so it is possible to have missing responses even if the respondent finished the survey. We will keep these responses.

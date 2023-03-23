@@ -15,6 +15,12 @@ preprocessing procedure with one click, please knit the
 
 ## Folder structure
 
+The `root` folder includes the `interactive_report.Rmd` file, which
+includes an interactive document for reanalyzing our results with
+different subsets of the data. To run the interactive document locally
+on your computer, click the *Run document* button in Rstudio or run the
+`rmarkdown::run("interactive_report.Rmd")` function in your R console.
+
 The `data/` folder contains all the datafiles and the corresponding
 codebooks that are needed to reproduce the results of the project.
 
@@ -32,14 +38,8 @@ rmarkdowns. Within this folder you can find the following files:
   analysis.
 
 The `manuscript/` folder contains the manuscript and supplementary
-materials documents with the analysis code embedded in them. The folder
-also includes the `interactive_report.Rmd` file, which includes an
-interactive document for reanalyzing our results with different subsets
-of the data. To run the interactive document locally on your computer,
-click the *Run document* button in Rstudio or run the
-`rmarkdown::run(here::here("manuscript/interactive_report.Rmd"))`
-function in your R console. The `figs/` subfolder contains the rendered
-figures from the manuscript and supplementary materials in .pdf and .png
-formats.
+materials documents with the analysis code embedded in them. The `figs/`
+subfolder contains the rendered figures from the manuscript and
+supplementary materials in .pdf and .png formats.
 
 The `R/` folder contains any custom R functions and their documentation.

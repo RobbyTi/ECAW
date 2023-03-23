@@ -10,39 +10,42 @@ center_level <- function(var) (n_levels(var) - 1) / 2 + 1
 #' Calculate the percentage of responses of each factor level
 level_percentage <- function(data, var, levels, exclude = NULL, exclude_missing = TRUE) {
   res <-
-    data %>% 
+    data %>%
     filter(
-      # exclude specified answer option(s)
-      {{var}} %ni% exclude
+      # Exclude specified answer option(s)
+      {{ var }} %ni% exclude
     )
-  
-  # exclude missing responses
-  if(exclude_missing) {
+
+  # Exclude missing responses
+  if (exclude_missing) {
+    message(paste(nrow(filter(data, is.na({{ var }}))), "missing values were excluded."))
     res <-
-      res %>% 
-      filter(!is.na({{var}}))
+      res %>%
+      filter(!is.na({{ var }}))
   }
 
-  # res <-
-    res %>% 
+  res %>%
+    # Replace missing values with explicit text
     mutate(
+      # Replace missing values with explicit text
+      {{ var }} := replace_na({{ var }}, "Missing"),
       # Transform to factor with level order specified in levels arg
-      {{var}} := factor({{var}}, levels = levels)
-    ) %>% 
+      {{ var }} := factor({{ var }}, levels = levels)
+    ) %>%
     # Count the number of response on each factor level
-    count({{var}}) %>% 
+    count({{ var }}) %>%
     # Add n = 0 if no one choose a specific factor level
-    tidyr::complete({{var}}, fill = list(n = 0)) %>%
+    tidyr::complete({{ var }}, fill = list(n = 0)) %>%
     mutate(
       # Assign level id to each factor level in increasing order
-      levels_int = as.integer({{var}}),
+      levels_int = as.integer({{ var }}),
       # Calculate the number of all responses
       n_sum = sum(n),
       # Calculate the percentage for all factor level and round
       percentage = round(n / n_sum * 100)
-    ) %>% 
+    ) %>%
     # Reorder variables for cleaner output
-    select(levels_int, {{var}}, n, n_sum, percentage)
+    select(levels_int, {{ var }}, n, n_sum, percentage)
 }
 
 #' Calculate percentage for each support category

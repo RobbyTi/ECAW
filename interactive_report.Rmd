@@ -2,6 +2,8 @@
 title: "Results exploration"
 output: html_document
 runtime: shiny
+resource_files:
+- R/utils.R
 ---
 
 ```{r setup, include=FALSE}
@@ -379,8 +381,8 @@ alspac_plot_likert_data <- reactive({
 
 # Create figure
 renderPlot({
-  plot(alspac_plot_likert_data(), digits = 1, ordered = TRUE, group.order = names(alspac_plot_data()), text.size = 5.5) +
-    scale_x_discrete(labels = function(x) str_wrap(x, width = 25), limits = rev(names(alspac_plot_data))) +
+  plot(alspac_plot_likert_data(), digits = 1, text.size = 5.5) +
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 25), limits = rev(names(alspac_plot_data()))) +
     labs(title = str_wrap("Thinking about a study you may run with ALSPAC data (or one that you have recently run)..."), width = 25) +
     theme(
       axis.title.x = element_blank(),

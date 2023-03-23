@@ -255,7 +255,9 @@ ecaw_reproducible <- support_percentage(
 )
 ```
 
-```{r typicallyEcawPlot, warning=FALSE, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=12.8, fig.height=6, fig.path='figs/', dev=c('png', 'pdf')}
+Most respondents agreed that studies that analyze preexisting observational datasets are trustworthy[^3] (`r pull(filter(typically_trustworthy, support == "positive"), percentage)`%; `r pull(filter(typically_trustworthy, support == "positive"), n)`/`r pull(filter(typically_trustworthy, support == "positive"), n_sum)`) and reproducible[^4] (`r pull(filter(typically_reproducible, support == "positive"), percentage)`%; `r pull(filter(typically_reproducible, support == "positive"), n)`/`r pull(filter(typically_reproducible, support == "positive"), n_sum)`) (Figure 2, top panel). At the same time, many agreed that a study using an ECAW would be _more_ trustworthy (`r pull(filter(ecaw_trustworthy, support == "positive"), percentage)`%; `r pull(filter(ecaw_trustworthy, support == "positive"), n)`/`r pull(filter(ecaw_trustworthy, support == "positive"), n_sum)`) and _more_ reproducible (`r pull(filter(ecaw_reproducible, support == "positive"), percentage)`%; `r pull(filter(ecaw_reproducible, support == "positive"), n)`/`r pull(filter(ecaw_reproducible, support == "positive"), n_sum)`) compared to a typical study using preexisting observational data (Figure 2, bottom panel).
+
+```{r typicallyEcawPlot, warning=FALSE, fig.cap="(ref:typicallyEcawPlotCaption)", fig.align="center", out.width="100%", fig.width=12.8, fig.height=6, fig.path='figs/', dev=c('png', 'pdf')}
 # Create typically trustworthy and reproducible plot
 # Check if there is any missing and don't understand responses separately
 # processed %>%
@@ -302,7 +304,7 @@ typically_plot <-
 
 # Create ecaw trustworthy and reproducible plot
 # Calculate missing responses
-ecaw_missing_text <-
+ecaw_missing <-
   processed %>%
   select(contains("ecaw_")) %>%
   pivot_longer(
@@ -316,9 +318,7 @@ ecaw_missing_text <-
   group_by(item, value) %>%
   summarise(
     n = n()
-  ) %>%
-  ungroup() %>%
-  mutate(text = paste(value, "=", n))
+  )
 
 # Prepare plot data
 ecaw_plot_data <-
@@ -375,84 +375,72 @@ ecaw_plot <-
 typically_plot + ecaw_plot + plot_layout(ncol = 1, nrow = 2)
 ```
 
-Respondents generally agreed that studies that analyze preexisting observational datasets are trustworthy[^3] (`r pull(filter(typically_trustworthy, support == "positive"), percentage)`%) and reproducible[^4] (`r pull(filter(typically_reproducible, support == "positive"), percentage)`%) (Figure 1A). At the same time, many agreed that a study using an ECAW would be _more_ trustworthy (`r pull(filter(ecaw_trustworthy, support == "positive"), percentage)`%) and _more_ reproducible (`r pull(filter(ecaw_reproducible, support == "positive"), percentage)`%) compared to a typical study using preexisting observational data (Figure 1B).
+(ref:typicallyEcawPlotCaption) __Responses to the survey questions on trustworthiness and reproducibility of observational research with preexisting data and ECAWs.__ The survey defined trustworthy as “meaning that the results and conclusions of the publications are valid, reliable, rigorous, and accurate. That they merit trust”. The survey defined reproducible “in the sense that other researchers re-analysing the data with the same research question would produce similar results.” For each item, the number to the left of the data bar indicates the combined percentage for the responses depicted in any shade of brown/orange. The number in the center of the data bar (gray) indicates the percentage of neutral responses. The number to the right of the data bar indicates the combined percentage for the responses depicted in any shade of green. For the bottom panel we excluded the missing responses (n = `r pull(filter(ecaw_missing, item == "Trustworthy" & value == "Missing"), n)`; `r pull(filter(ecaw_missing, item == "Reproducible" & value == "Missing"), n)`) and responses of “I don't understand the question” (n = `r pull(filter(ecaw_missing, item == "Trustworthy" & value == "I don't understand the question"), n)`; `r pull(filter(ecaw_missing, item == "Reproducible" & value == "I don't understand the question"), n)`).
 
 ```{r methodDescriptives, include=FALSE}
+# Define the response level order for these variables
+method_levels <- c(
+  "Never or almost never",
+  "Sometimes",
+  "About half the time",
+  "Most of the time",
+  "Always or almost always",
+  "I don't understand the question",
+  "Missing"
+)
+
+# Calculate the fequency and proportion of responses for each response level
 confirmatory <- level_percentage(
   processed,
   method_confirmatory,
-  c(
-    "Never or almost never",
-    "Sometimes",
-    "About half the time",
-    "Most of the time",
-    "Always or almost always"
-  ),
-  "I don't understand the question"
+  method_levels,
+  exclude_missing = FALSE
 ) %>%
-  filter(method_confirmatory != "Never or almost never") %>%
-  summarise(sum_percentage = sum(percentage)) %>%
-  pull(sum_percentage)
+  filter(method_confirmatory %in% c("Sometimes", "About half the time", "Most of the time", "Always or almost always")) %>%
+  summarise(
+    n = sum(n),
+    # Since n_sum should be the same for the whole dataset we can use unique to return one value
+    n_sum = unique(n_sum),
+    percentage = sum(percentage))
 
 exploratory <- level_percentage(
   processed,
   method_exploratory,
-  c(
-    "Never or almost never",
-    "Sometimes",
-    "About half the time",
-    "Most of the time",
-    "Always or almost always"
-  ),
-  "I don't understand the question"
+  method_levels,
+  exclude_missing = FALSE
 ) %>%
-  dplyr::filter(method_exploratory != "Never or almost never") %>%
-  summarise(sum_percentage = sum(percentage)) %>%
-  pull(sum_percentage)
+  dplyr::filter(method_exploratory  %in% c("Sometimes", "About half the time", "Most of the time", "Always or almost always")) %>%
+  summarise(
+    n = sum(n),
+    # Since n_sum should be the same for the whole dataset we can use unique to return one value
+    n_sum = unique(n_sum),
+    percentage = sum(percentage))
 
 preregistered <- level_percentage(
   processed,
   method_preregistered,
-  c(
-    "Never or almost never",
-    "Sometimes",
-    "About half the time",
-    "Most of the time",
-    "Always or almost always"
-  ),
-  "I don't understand the question"
+  method_levels,
+  exclude_missing = FALSE
 )
 
 blind <- level_percentage(
   processed,
   method_blind,
-  c(
-    "Never or almost never",
-    "Sometimes",
-    "About half the time",
-    "Most of the time",
-    "Always or almost always"
-  ),
-  "I don't understand the question"
+  method_levels,
+  exclude_missing = FALSE
 )
 
 script <- level_percentage(
   processed,
   method_script,
-  c(
-    "Never or almost never",
-    "Sometimes",
-    "About half the time",
-    "Most of the time",
-    "Always or almost always"
-  ),
-  "I don't understand the question"
+  method_levels,
+  exclude_missing = FALSE
 )
 ```
 
-Over half of respondents reported that their studies using preexisting observational data are preregistered never or almost never (`r filter(preregistered, method_preregistered == "Never or almost never") %>% pull(percentage)`%), or sometimes (`r filter(preregistered, method_preregistered == "Sometimes") %>% pull(percentage)`%) (Figure 2A). About half reported sharing their analysis scripts never or almost never (`r filter(script, method_script == "Never or almost never") %>% pull(percentage)`%), or sometimes (`r filter(script, method_script == "Sometimes") %>% pull(percentage)`%) (Figure 2B). `r filter(blind, method_blind == "Never or almost never") %>% pull(percentage)`% reported that they never or almost never blind the data analyst (Figure 2C). Almost all respondents answered that they use both exploratory (`r exploratory`%) and confirmatory (`r confirmatory`%) analyses at least sometimes (Figure 2D-E).
+Over half of respondents reported that their studies using preexisting observational data are preregistered never or almost never (`r filter(preregistered, method_preregistered == "Never or almost never") %>% pull(percentage)`%; `r filter(preregistered, method_preregistered == "Never or almost never") %>% pull(n)`/`r filter(preregistered, method_preregistered == "Never or almost never") %>% pull(n_sum)`), or sometimes (`r filter(preregistered, method_preregistered == "Sometimes") %>% pull(percentage)`%; `r filter(preregistered, method_preregistered == "Sometimes") %>% pull(n)`/`r filter(preregistered, method_preregistered == "Sometimes") %>% pull(n_sum)`) (Figure 2A). About half reported sharing their analysis scripts never or almost never (`r filter(script, method_script == "Never or almost never") %>% pull(percentage)`%; `r filter(script, method_script == "Never or almost never") %>% pull(n)`/`r filter(script, method_script == "Never or almost never") %>% pull(n_sum)`), or sometimes (`r filter(script, method_script == "Sometimes") %>% pull(percentage)`%; `r filter(script, method_script == "Sometimes") %>% pull(n)`/`r filter(script, method_script == "Sometimes") %>% pull(n_sum)`) (Figure 3). `r filter(blind, method_blind == "Never or almost never") %>% pull(percentage)`% (`r filter(blind, method_blind == "Never or almost never") %>% pull(n)`/`r filter(blind, method_blind == "Never or almost never") %>% pull(n_sum)`) reported that they never or almost never blind the data analyst (Figure 3). Almost all respondents answered that they use both exploratory (`r pull(exploratory, percentage)`%; `r pull(exploratory, n)`/`r pull(exploratory, n_sum)`) and confirmatory (`r pull(confirmatory, percentage)`%; `r pull(confirmatory, n)`/`r pull(confirmatory, n_sum)`) analyses at least sometimes (Figure 3).
 
-```{r methodPlot, warning=FALSE, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=11, fig.height=4.5, fig.path='figs/', dev=c('png', 'pdf')}
+```{r methodPlot, warning=FALSE, fig.cap="(ref:methodPlotCaption)", fig.align="center", out.width="100%", fig.width=11, fig.height=4.5, fig.path='figs/', dev=c('png', 'pdf')}
 # Used methods figures
 method_plot_data <-
   processed %>%
@@ -541,6 +529,8 @@ method_plot_data %>%
   )
 ```
 
+(ref:methodPlotCaption) __Responses to survey questions about the research practices of participants.__
+
 ```{r aslpacDescriptives, include=FALSE, warning=FALSE, message=FALSE}
 willing <- support_percentage(
   processed,
@@ -607,11 +597,11 @@ prefer <- support_percentage(
 )
 ```
 
-`r pull(filter(willing, support == "positive"), percentage)`% of respondents agreed (versus `r pull(filter(willing, support == "negative"), percentage)`% who disagreed) that they would be less willing to use ALSPAC data if they were required to use an ECAW (Figure 3). `r pull(filter(opt, support == "positive"), percentage)`% agreed (`r pull(filter(opt, support == "negative"), percentage)`% disagreed) that they would opt-in if ALSPAC ran a study on ECAWs. `r pull(filter(study, support == "positive"), percentage)`% agreed (`r pull(filter(study, support == "negative"), percentage)`% disagreed) that ALSPAC should run a study on ECAWs. `r pull(filter(prefer, support == "positive"), percentage)`% agreed (`r pull(filter(prefer, support == "negative"), percentage)`% disagreed) that they would prefer using an ECAW than using typical preregistration.
+`r pull(filter(willing, support == "positive"), percentage)`% (`r pull(filter(willing, support == "positive"), n)`/`r pull(filter(willing, support == "positive"), n_sum)`) of respondents agreed (versus `r pull(filter(willing, support == "negative"), percentage)`%; `r pull(filter(willing, support == "negative"), n)`/`r pull(filter(willing, support == "negative"), n_sum)` who disagreed) that they would be less willing to use ALSPAC data if they were required to use an ECAW (Figure 3). `r pull(filter(opt, support == "positive"), percentage)`% (`r pull(filter(opt, support == "positive"), n)`/`r pull(filter(opt, support == "positive"), n_sum)`) agreed (`r pull(filter(opt, support == "negative"), percentage)`%; `r pull(filter(opt, support == "negative"), n)`/`r pull(filter(opt, support == "negative"), n_sum)` disagreed) that they would opt-in if ALSPAC ran a study on ECAWs. `r pull(filter(study, support == "positive"), percentage)`% (`r pull(filter(study, support == "positive"), n)`/`r pull(filter(study, support == "positive"), n_sum)`) agreed (`r pull(filter(study, support == "negative"), percentage)`%; `r pull(filter(study, support == "negative"), n)`/`r pull(filter(study, support == "negative"), n_sum)` disagreed) that ALSPAC should run a study on ECAWs. `r pull(filter(prefer, support == "positive"), percentage)`% (`r pull(filter(prefer, support == "positive"), n)`/`r pull(filter(prefer, support == "positive"), n_sum)`) agreed (`r pull(filter(prefer, support == "negative"), percentage)`%; `r pull(filter(prefer, support == "negative"), n)`/`r pull(filter(prefer, support == "negative"), n_sum)` disagreed) that they would prefer using an ECAW than using typical preregistration.
 
-```{r alspacPlot, warning=FALSE, message=FALSE, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=14, fig.height=5, fig.path='figs/', dev=c('png', 'pdf')}
+```{r alspacPlot, warning=FALSE, message=FALSE, fig.cap="(ref:alspacPlotCaption)", fig.align="center", out.width="100%", fig.width=14, fig.height=5, fig.path='figs/', dev=c('png', 'pdf')}
 # Check if there is any missing and don't understand responses separately
-alspac_missing_text <-
+alspac_missing <-
   processed %>%
   select(contains("alspac_")) %>%
   pivot_longer(
@@ -620,14 +610,29 @@ alspac_missing_text <-
     values_to = "value"
   ) %>%
   dplyr::filter(is.na(value) | value == "I don't understand the question" | value == "Unsure") %>%
-  mutate(item = str_to_title(str_remove(item, "^[^_]*_"))) %>%
+  mutate(
+    item = str_to_title(str_remove(item, "^[^_]*_")),
+    # We reorder it by making it a factor
+    item = factor(item, levels = c(
+      "Less_willing",
+      "Opt_in",
+      "Study",
+      "Prefer_ecaw"
+    )),
+    # By making it a factor we can complete missing levels in the data later
+    value = factor(value, levels = c(
+      "Missing",
+      "I don't understand the question",
+      "Unsure"
+    ))
+  ) %>%
   replace_na(list(value = "Missing")) %>%
   group_by(item, value) %>%
   summarise(
     n = n()
-  ) %>%
-  ungroup() %>%
-  mutate(text = paste(value, "=", n))
+  ) %>% 
+  # Add n = 0 if no one choose a specific factor level
+  tidyr::complete(value, fill = list(n = 0)) 
 
 # Prepare plot data
 alspac_plot_data <-
@@ -668,7 +673,7 @@ alspac_plot_data <-
 alspac_plot_likert_data <- likert(alspac_plot_data)
 
 # Create figure
-plot(alspac_plot_likert_data, digits = 1, ordered = TRUE, text.size = 6) +
+plot(alspac_plot_likert_data, digits = 1, text.size = 6) +
   # TODO: have to check if this is not messing with the results
   scale_x_discrete(labels = function(x) str_wrap(x, width = 30), limits = rev(names(alspac_plot_data))) +
   scale_y_continuous(labels = c("100%", "50%", "0%", "50%", "100%"), limits = c(-105, 105)) +
@@ -682,6 +687,8 @@ plot(alspac_plot_likert_data, digits = 1, ordered = TRUE, text.size = 6) +
     legend.title = element_blank()
   )
 ```
+
+(ref:alspacPlotCaption) __Responses to survey questions about using ECAWs.__ The 4 questions we excluded missing values (_n_ = `r pull(filter(alspac_missing, item == "Less_willing" & value == "Missing"), n)`; `r pull(filter(alspac_missing, item == "Opt_in" & value == "Missing"), n)`; `r pull(filter(alspac_missing, item == "Study" & value == "Missing"), n)`; `r pull(filter(alspac_missing, item == "Prefer_ecaw" & value == "Missing"), n)`), responses of "I don't understand the question" (_n_ = `r pull(filter(alspac_missing, item == "Less_willing" & value == "I don't understand the question"), n)`; `r pull(filter(alspac_missing, item == "Opt_in" & value == "I don't understand the question"), n)`; `r pull(filter(alspac_missing, item == "Study" & value == "I don't understand the question"), n)`; `r pull(filter(alspac_missing, item == "Prefer_ecaw" & value == "I don't understand the question"), n)`), and responses of "Unsure" (_n_ = `r pull(filter(alspac_missing, item == "Less_willing" & value == "Unsure"), n)`; `r pull(filter(alspac_missing, item == "Opt_in" & value == "Unsure"), n)`; `r pull(filter(alspac_missing, item == "Study" & value == "Unsure"), n)`; `r pull(filter(alspac_missing, item == "Prefer_ecaw" & value == "Unsure"), n)`).
 
 ```{r include=FALSE}
 # Open ended questions

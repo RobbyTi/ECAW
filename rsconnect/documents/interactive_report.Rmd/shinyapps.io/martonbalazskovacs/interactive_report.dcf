@@ -1,0 +1,15 @@
+name: interactive_report
+title: interactive_report
+username:
+account: martonbalazskovacs
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 8652462
+bundleId: 6998070
+url: https://martonbalazskovacs.shinyapps.io/interactive_report/
+when: 1679582048.92052
+lastSyncTime: 1679582048.92055
+asMultiple: TRUE
+asStatic: FALSE
+additionalFiles: R/utils.R
+ignoredFiles: README.Rmd
