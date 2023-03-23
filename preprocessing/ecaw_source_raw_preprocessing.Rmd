@@ -76,6 +76,15 @@ codebook <-
 readr::write_csv(codebook, here("data/source/ecaw_221102_source_codebook.csv"))
 ```
 
+Creating a codebook for the raw data as well based on the source codebook.
+
+```{r}
+codebook %>% 
+  rename(var_name = new_var_name) %>%
+  select(var_name, description) %>% 
+  readr::write_csv(., here("data/raw/ecaw_raw_codebook.csv"))
+```
+
 # Variable renaming
 
 We are assigning the new variable names to the source data table using the codebook.

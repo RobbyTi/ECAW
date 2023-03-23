@@ -419,6 +419,12 @@ source &lt;-
 
 # Save the codebook
 readr::write_csv(codebook, here(&quot;data/source/ecaw_221102_source_codebook.csv&quot;))</code></pre>
+<p>Creating a codebook for the raw data as well based on the source
+codebook.</p>
+<pre class="r"><code>codebook %&gt;% 
+  rename(var_name = new_var_name) %&gt;%
+  select(var_name, description) %&gt;% 
+  readr::write_csv(., here(&quot;data/raw/ecaw_raw_codebook.csv&quot;))</code></pre>
 </div>
 <div id="variable-renaming" class="section level1">
 <h1>Variable renaming</h1>

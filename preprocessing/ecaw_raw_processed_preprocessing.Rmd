@@ -38,20 +38,6 @@ raw <-
   dplyr::filter(lubridate::as_date(start_date) >= lubridate::as_date("2022-10-10"))
 ```
 
-## Partial responses
-
-We only include full responses in the final analysis as preregistered (see the full text of the preregistration [https://osf.io/g2fw5](https://osf.io/g2fw5)). There were `r nrow(dplyr::filter(raw, !finished))` respondents who did not finish the survey.
-
-```{r}
-raw <- 
-  raw %>% 
-  dplyr::filter(finished)
-```
-
-These responses will be included in an exploratory analysis that will be published in supplementary materials D.
-
-At the end of the exclusion we had `r nrow(raw)` responses remaining for the analysis.
-
 It was optional to answer all of the questions in our survey, so it is possible to have missing responses even if the respondent finished the survey. We will keep these responses.
 
 ```{r}
@@ -84,7 +70,59 @@ raw <-
       )
 ```
 
-There were `r filter(raw, has_missing) %>% nrow()` respondents who had at least one missing value in the main questions of interests.
+## Partial responses
+
+We only include full responses in the final analysis as preregistered (see the full text of the preregistration [https://osf.io/g2fw5](https://osf.io/g2fw5)). There were `r nrow(dplyr::filter(raw, !finished))` respondents who did not finish the survey.
+
+However, these responses will be included in an exploratory analysis that will be published in supplementary materials D. So we save them separately before exclusion.
+
+```{r}
+processed_all <- 
+  raw %>%
+  mutate(duration_in_mins = duration_in_seconds / 60) %>%
+  select(
+    -start_date,
+    -end_date,
+    -status,
+    -progress,
+    -finished,
+    -duration_in_seconds,
+    -recorded_date,
+    -distribution_channel,
+    -user_language
+  )
+
+readr::write_csv(processed_all, here("data/processed/ecaw_processed_all_data.csv"))
+```
+
+The full dataset that we are going to use to calculate the results in Supplement D includes `r nrow(processed_all)` responses.
+
+We create a simple codebook for this dataset.
+
+```{r}
+processed_all_codebook <-
+  read_csv(here("data/source/ecaw_221102_source_codebook.csv")) %>% 
+  select(-original_var_name) %>% 
+  rename(var_name = new_var_name) %>% 
+  filter(var_name %in% colnames(processed_all)) %>% 
+  # Adding new column descriptions
+  mutate(
+    has_missing = "True if respondent has any missing responses.",
+    duration_in_mins = "Time spent from opening the survey to closing it in minutes."
+  )
+
+readr::write_csv(processed_all_codebook, here("data/processed/ecaw_processed_all_codebook.csv"))
+```
+
+Excluding the respondents who did not finish the questionnaire.
+
+```{r}
+raw <- 
+  raw %>% 
+  dplyr::filter(finished)
+```
+
+At the end of the exclusion we had `r nrow(raw)` responses remaining for the analysis. There were `r filter(raw, has_missing) %>% nrow()` respondents who had at least one missing value in the main questions of interests.
 
 # Distribution of completition time
 
@@ -183,17 +221,22 @@ raw <-
 
 # Creating a simple codebook
 
-For creating the codebook we will use the codebook created for the source data.
+For creating the codebook for the processed data we will use the codebook created for the source data.
 
 ```{r message=FALSE}
 codebook <-
-  read_csv(here("data/source/ecaw_221102_source_codebook.csv")) %>% 
-  select(-original_var_name) %>% 
-  rename(var_name = new_var_name) %>% 
-  filter(var_name %in% colnames(raw))
+  read_csv(here("data/source/ecaw_221102_source_codebook.csv")) %>%
+  select(-original_var_name) %>%
+  rename(var_name = new_var_name) %>%
+  filter(var_name %in% colnames(raw)) %>%
+  # Adding new column descriptions
+  mutate(
+    has_missing = "True if respondent has any missing responses.",
+    duration_in_mins = "Time spent from opening the survey to closing it in minutes."
+  )
 
 # Save the codebook
-readr::write_csv(codebook, here("data/raw/ecaw_raw_codebook.csv"))
+readr::write_csv(codebook, here("data/processed/ecaw_processed_codebook.csv"))
 ```
 
 # Save processed dataset
