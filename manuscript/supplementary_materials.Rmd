@@ -1,4 +1,4 @@
-# Supplementary materials C
+
 
 ```{r numStudiesPlot, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=6, fig.height=3.2, fig.path='figs/', dev=c('png', 'pdf')}
 # Create text for missing responses

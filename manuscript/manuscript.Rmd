@@ -140,6 +140,7 @@ xfun::Rscript_call(
 
 ```{r loadingData}
 processed <- read_csv(here::here("data/processed/ecaw_processed_data.csv"))
+processed_all <- read_csv(here::here("data/processed/ecaw_processed_all_data.csv"))
 ```
 
 ```{r analysisPreferences}
@@ -189,7 +190,7 @@ concerned <- support_percentage(
 )
 ```
 
-We invited the ALSPAC mailing list to participate, which included 1148 email addresses. 54 emails bounced, leaving 1094 emails that went through. The survey was completed `r nrow(processed)` times and partially completed `r nrow(dplyr::filter(processed, has_missing)) ` times, leading to a response rate of `r round(nrow(processed) / 1094 * 100)`% for complete surveys and `r round(nrow(filter(processed, has_missing)) / 1094 * 100)`% for incomplete surveys.[^1] The median time taken for complete survey responses was `r round(median(processed$duration_in_mins), 1)` minutes (IQR: `r round(quantile(processed$duration_in_mins, .25, na.rm = TRUE), 1)` to `r round(quantile(processed$duration_in_mins, .75, na.rm = T), 1)`).
+We invited the ALSPAC mailing list to participate, which included 1148 email addresses. 54 emails bounced, leaving 1094 emails that went through. The survey was completed `r nrow(processed)` times and partially completed `r nrow(processed_all) - nrow(processed) ` times, leading to a response rate of `r round(nrow(processed_all) / 1094 * 100)`% for complete surveys and `r round((nrow(processed_all) - nrow(processed)) / 1094 * 100)`% for incomplete surveys.[^1] The median time taken for complete survey responses was `r round(median(processed$duration_in_mins), 1)` minutes (IQR: `r round(quantile(processed$duration_in_mins, .25, na.rm = TRUE), 1)` to `r round(quantile(processed$duration_in_mins, .75, na.rm = T), 1)`).
 
 Respondents published a median of `r median(processed$n_studies)` (IQR `r round(quantile(processed$n_studies, .25, na.rm = TRUE), 1)` to `r round(quantile(processed$n_studies, .75, na.rm = TRUE), 1)`) studies using preexisting observational data (Figure S1). They reported using the programming languages `r language_text` (Table S1)[^2]. `r pull(filter(concerned, support == "positive"), percentage)`% (`r pull(filter(concerned, support == "positive"), n)`/`r pull(filter(concerned, support == "positive"), n_sum)`) of participants reported being more concerned with research trustworthiness, bias, rigour, and reproducibility compared to what they think of as a typical research who uses preexisting observational data (Figure C2); `r pull(filter(concerned, support == "negative"), percentage)`% (`r pull(filter(concerned, support == "negative"), n)`/`r pull(filter(concerned, support == "negative"), n_sum)`) reported being less concerned.
 
@@ -390,7 +391,7 @@ method_levels <- c(
   "Missing"
 )
 
-# Calculate the fequency and proportion of responses for each response level
+# Calculate the frequency and proportion of responses for each response level
 confirmatory <- level_percentage(
   processed,
   method_confirmatory,
@@ -723,4 +724,3 @@ Table 1. Recurring topics in responses to the open-ended survey questions. The s
 
 ```{r child = "supplementary_materials.Rmd"}
 ```
-
