@@ -1,88 +1,48 @@
 ---
-title             : "A survey of registration practices among observational researchers using preexisting datasets"
+title             : "Reducing bias in secondary data analysis via an Explore and Confirm Analysis Workflow (ECAW): A proposal and survey of observational researchers"
 shorttitle        : "Explore and Confirm Analysis Workflow"
 author:
   - name: Robert T. Thibault
-    affiliation: '1,5'
-    role:
-      - Conceptualization
-      - Data curation
-      - Formal analysis
-      - Funding acquisition
-      - Investigation
-      - Methodology
-      - Project administration
-      - Resources
-      - Supervision
-      - Validation
-      - Visualization
-      - Writing - original draft
-      - Writing - review & editing
+    affiliation: '1,2'
     corresponding: yes
     email: robert.thibault@stanford.edu
     address: Enter postal address here
   - name: Marton Kovacs
-    affiliation: '2,6'
-    role:
-      - Data curation
-      - Formal analysis
-      - Software
-      - Validation
-      - Visualization
-      - Writing - review & editing
+    affiliation: '3,4'
     email: marton.balazs.kovacs@gmail.com
   - name: Tom E. Hardwicke
-    affiliation: '3'
-    role:
-      - Methodology
-      - Writing - review & editing
+    affiliation: '5'
   - name: Alexandra Sarafoglou
-    affiliation: '4'
-    role:
-      - Methodology
-      - Writing - review & editing
+    affiliation: '6'
   - name: John P. A. Ioannidis
-    affiliation: '4'
-    role:
-      - Methodology
-      - Writing - review & editing
-  - name: Marcus R. Munafò
     affiliation: '1,7'
-    role:
-      - Conceptualization
-      - Methodology
-      - Supervision
-      - Writing - review & editing
+  - name: Marcus R. Munafò
+    affiliation: '2,8'
 affiliation:
   - id: '1'
     institution: Meta-Research Innovation Center at Stanford (METRICS), Stanford University.
   - id: '2'
-    institution: Doctoral School of Psychology, ELTE Eotvos Lorand University, Budapest,
-      Hungary
-  - id: '3'
-    institution: Melbourne School of Psychological Sciences, University of Melbourne.
-  - id: '4'
-    institution: Department of Psychology, University of Amsterdam.
-  - id: '5'
     institution: School of Psychological Science, University of Bristol.
+  - id: '3'
+    institution: Doctoral School of Psychology, ELTE Eotvos Lorand University, Budapest, Hungary
+  - id: '4'
+    institution: Institute of Psychology, ELTE Eotvos Lorand University, Budapest, Hungary
+  - id: '5'
+    institution: Melbourne School of Psychological Sciences, University of Melbourne.
   - id: '6'
-    institution: Institute of Psychology, ELTE Eotvos Lorand University, Budapest,
-      Hungary
+    institution: Department of Psychology, University of Amsterdam.
   - id: '7'
     institution: Meta-Research Innovation Center Berlin (METRIC-B), QUEST Center for
       Transforming Biomedical Research, Berlin Institute of Health, Charité – Universitätsmedizin
       Berlin.
   - id: '8'
     institution: MRC Integrative Epidemiology Unit at the University of Bristol.
-  - id: '9'
-    institution: Departments of Medicine, Epidemiology and Population Health, Biomedical
-      Data Science, and Statistics, Stanford University.
 abstract: |
-  placeholder for an abstract
+  \textbf{Background.} Although preregistration can reduce researcher bias and increase transparency in primary research settings, it is less applicable to secondary data analysis. An alternative method that affords additional protection from researcher bias, which cannot be gained from conventional forms of preregistration alone, is an Explore and Confirm Analysis Workflow (ECAW). In this workflow, a data management organization initially provides access to only a subset of their dataset to researchers who request it. The researchers then prepare an analysis script based on the subset of data, upload the analysis script to a registry, and then receive access to the full dataset. ECAWs aim to achieve similar goals as preregistration, but make access to the full dataset contingent on compliance. The present survey aimed to garner information from the research community where ECAWs could be applied—employing the Avon Longitudinal Study of Parents and Children (ALSPAC) as a case example. \hfill \break \hfill \break \textbf{Methods.} We emailed a web-based survey to researchers who had previously applied for access to ALSPAC’s transgenerational observational dataset.\hfill \break \hfill \break \textbf{Results}. We received 107 responses, for a 10% response rate. The results suggest that—at least among our sample of respondents—ECAWs hold the potential to serve their intended purpose and appear relatively acceptable. For example, only 10% of respondents disagreed that ALSPAC should run a study on ECAWs (versus 55% who agreed). However, as many as 25% of respondents agreed that they would be less willing to use ALSPAC data if they were required to use an ECAW (versus 44% who disagreed).\hfill \break \hfill \break \textbf{Conclusion.} Our data and findings provide information for organizations and individuals interested in implementing ECAWs and related interventions. \hfill \break \hfill \break \textbf{Preregistration:} https://osf.io/g2fw5 Deviations from the preregistration are outlined in Supplementary Material A.
   
-keywords          : "keywords"
-wordcount         : "X"
-# bibliography      : "references.bib"
+keywords          : "Blind data analysis; preregistration; ALSPAC; meta-research; open science; Explore and Confirm Analysis Workflow (ECAW)"
+wordcount         : "3546"
+bibliography      : "ecaw-ref.bib"
 floatsintext      : yes
 linenumbers       : yes
 draft             : no
@@ -93,7 +53,14 @@ footnotelist      : no
 appendix: "supplementary_materials.Rmd"
 
 classoption       : "man"
-output            : papaja::apa6_pdf
+output            :
+  papaja::apa6_pdf:
+    latex_engine: xelatex
+    extra_dependencies: "tcolorbox"
+header-includes   :
+  - \usepackage{tcolorbox}
+  - \usepackage{caption}
+  - \captionsetup[figure]{labelformat=empty}
 editor_options: 
   chunk_output_type: console
 ---
@@ -109,7 +76,7 @@ library(patchwork)
 library(likert)
 library(knitr)
 library(viridis)
-# r_refs("references.bib")
+r_refs("ecaw-ref.bib")
 ```
 
 ```{r customScripts}
@@ -148,10 +115,67 @@ knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
 ```
 
 # Introduction
+Many published research findings are non-reproducible and potentially false or misleading [@camerer_evaluating_2016; @errington_investigating_2021; @ioannidis_why_2005; @ioannidis_why_2008; @collaboration_estimating_2015]. These shortcomings may stem from a combination of researcher bias, publication bias, selective reporting of results, incomplete reporting of methods, and other questionable research practices. These issues can lead to research waste, and ineffective or even harmful healthcare and policy interventions (e.g., see @prasad_ending_2019). 
+
+Some research disciplines have adopted standards to address these issues. For example, researchers conducting clinical trials regularly register outcome measures before enrolling participants, and they keep both participants and experimenters blind regarding group assignment.  In cases where datasets already exist, however, researchers cannot easily adopt these practices. Researchers performing secondary data analyses generally have access to complete datasets without any blinding imposed on them. This may lead to exploration of diverse analyses and selective reporting based on the nature of the results. 
+
+## Preregistration in the context of secondary data analyses
+Increasing the uptake and effectiveness of preregistration for secondary data analyses may require a different approach than it does for clinical trials. For example, the analytical space for secondary data analyses (e.g., of a longitudinal cohort dataset) is more vast than the analytical space for most clinical trials. Thus, the clinical trial standard of registering outcome measures, but no analysis plan, remains insufficient. Moreover, preregistration of secondary data analyses remains uncommon, and unlike for clinical trials (where the dataset doesn’t yet exist), there is no guarantee that researchers performing secondary data analyses haven’t accessed the dataset. To extend the benefits of preregistration to secondary data analyses, we propose a workflow that necessitates the preregistration of an executable analysis script before researchers can access the full dataset.
+
+## Explore and Confirm Analysis Workflow (ECAW)
+In this intervention we propose, a data management organization that controls access to a preexisting data set would first provide access to only a subset of the data a researcher requests. After the researcher prepares an analysis script based on the subset of data and uploads it to a registry—where it will be openly accessible and permanent (e.g., to the Open Science Framework Registry)—the data management organization then provides access to the full dataset (e.g., via a secure data environment) and the researcher can proceed as they wish. The exact implementation (e.g., whether the data management organization runs quality checks on the analysis scripts) would depend on the preferences of the data management organization and the research community using their dataset (see Box 1 for an hypothetical example).
+
+We call this process an Explore and Confirm Analysis Workflow (ECAW). Researchers may use the subset of data to generate hypotheses and/or to simply ensure that their intended analysis runs properly. ECAWs may increase the uptake of preregistration and provide assurance that the analyses were developed before the researchers observed the full dataset. Moreover, whereas conventional preregistrations often leave many degrees of freedom regarding exactly how the data will be analyzed (e.g., @bakker_ensuring_2020), ECAWs provide an executable analysis script. Researchers may also find ECAWs more agreeable than conventional preregistration because they allow for exploration. ECAWs would not fully solve publication bias, but could make it easier to detect because the registered analysis script would serve as a form of preregistration. 
+
+In short, ECAWs give researchers access to enough data to develop an informed analysis, but without compromising the confirmatory nature of a final analysis on the complete dataset.
+
+\pagebreak
+
+\begin{tcolorbox}
+\textbf{Box 1. A hypothetical example of an ECAW in practice.}
+
+\includegraphics[width=1\textwidth]{./ecaw_workflow.png}
+{\fontsize{10pt}{10pt}\selectfont
+The overarching framework for ECAWs is depicted above. Within this framework, data management organizations would need to pre-specify several details for each step. Below, we provide a hypothetical example for illustrative purposes. The exact implementation of ECAWs would depend on the preferences of each data management organization and the community who uses their dataset.
+
+\begin{enumerate}
+  \item A research team submits to a data management organization (i) a paragraph describing the analyses they want to run, and (ii) a list of the variables they want to analyze.
+  \item The data management organization provides the research team with access to a subset of the data. For example, if the research team requests data for 15 variables collected from 10,000 participants, the data management organization will provide access to all 15 variables from a random subset of participants—say 1000.
+  \item The research team prepares an analysis script written in a common programming language (e.g., R or Stata) using the subset of data. They register this analysis script, the output from the script, and the paragraph they sent to the data management organization in Step 1, to www.osf.io/registries as an ‘Open-Ended Registration’. The researchers are free to run as many analyses as they would like on the subset of data. However, they should only register the analysis script they plan to use on the complete dataset.
+  \item The data management organization performs a basic quality check. They ensure that (i) the analysis script, the script output, and the paragraph are registered, and (ii) the output contains a clear number of itemized results (e.g., as clinicaltrials.gov does for outcome measures). If the quality check fails, the data management organization asks the researchers to update their registration until it passes. The research team is then given access to a dataset with all the variables requested for all participants.
+  \item The researchers can proceed as they wish. They can run the registered analysis script on the complete dataset, make adjustments to the analysis if desired, or not proceed at all. The data management organization does not perform any additional check on what analyses were run. Regardless of what the research team decides, a permanent version of the planned analysis is available on the OSF Registry.
+\end{enumerate}
+}
+\end{tcolorbox}
+
+\pagebreak
+
+## Examples of ECAW-like workflows
+One study probed the benefits and drawbacks of a workflow similar to ECAWs, but they provided a synthetic dataset rather than a data subset (@sarafoglou_comparing_2023). The researchers recruited 120 teams to analyze a single observational dataset and had half the teams preregister a written analysis plan and the other half prepare an analysis plan by drafting an analysis script based on a dataset with shuffled data for the variables of interest (i.e., the analysts were effectively blinded). Based on self-reports from the participants, the researchers found that two workflows were comparable in terms of effort and that teams using blinded data analysis made fewer deviations from their analysis plan. 
+
+Some disciplines, such as particle physics, implement blind data analyses regularly (@klein_blind_2005; @maccoun_blind_2015). A version of the ECAW workflow has also been successfully implemented by eight teams performing secondary data analysis on a dataset managed by the Psychological Science Accelerator group (@Forscher2020) and is currently being used for Registered Reports based on a large psychology dataset (@Schmidt2023). 
+
+In medicine and clinical epidemiology, a similar workflow is implemented by the software platform OpenSAFELY (www.opensafely.org). This platform provides a dataset of simulated health records from which researchers can develop an analysis script. When ready, a researcher submits their analysis script which is automatically logged and made public in GitHub. The analysis then runs in a Trusted Research Environment (TRE) on data which is stored in the data centers where patients’ records already reside (i.e., the data is not copied or moved). This workflow keeps individual health records hidden while also documenting all analyses run on the real data.
+
+## Study objectives
+Here, we present a descriptive and exploratory survey study. We had no hypotheses, but we did have two specific objectives. (1) To gain insights on the opinions and practices of researchers who already use preexisting observational datasets, in regards to the trustworthiness and reproducibility of research. (2) To use these insights to inform future research—including a potential trial of ECAWs with the Avon Longitudinal Study of Parents and Children (ALSPAC)—on how data management organizations can encourage rigorous and reproducible research practices.
 
 # Methods
+## Participants
+We sent an email to invite researchers on the mailing list for the UK-based Avon Longitudinal Study of Parents and Children (ALSPAC) to participate in an online survey (see Supplementary Material B). We partnered with ALSPAC because they manage an oft-requested dataset and expressed interest in studying ways to ensure the research stemming from their dataset is rigorous. ALSPAC is “a transgenerational prospective observational study investigating influences on health and development across the life course. It considers multiple genetic, epigenetic, biological, psychological, social and other environmental exposures in relation to a similarly diverse range of health, social and developmental outcomes.” (Boyd et al., 2013; Fraser et al., 2013). Thus, our invitation reached researchers that use observational data across the health and social sciences.  The survey was open from 10 Oct 2022 to 1 Nov 2022. We sent two reminder emails, exactly one week and two weeks after the original email invitation. The mailing list comprises researchers whose email addresses were present on a proposal to access the ALSPAC dataset and included 1148 email addresses. 
+
+## Survey
+The survey contained 6 blocks and is available at [https://osf.io/5h7gb](https://osf.io/5h7gb). We developed the survey with feedback from the Principal Investigator and Executive Director of ALSPAC (Nicholas Timpson and Kate Northstone). We aimed to include as few questions as possible (to encourage a high response rate) while still garnering substantive information on whether ECAWs are relevant and acceptable to ALSPAC users.
+
+Block 1 assessed the extent to which respondents believe that observational research using preexisting data is trustworthy and reproducible (2 questions). Block 2 asked respondents how often they use practices related to transparency and reducing researcher bias, including preregistration, blinded data analysis, and sharing analysis scripts (5 questions). Between Block 2 and Block 3, the survey described ECAWs. Block 3 assessed the extent to which respondents believe that ECAWs would make observational research using preexisting data more trustworthy and reproducible (2 questions). Block 4 directly asked respondents whether ALSPAC should run a study on ECAWs and whether they would participate (5 questions). Block 5 contained open-ended questions about the perceived benefits and drawbacks of ECAWs, reservations about ECAWs, whether additional incentives might be needed to use ECAW, and suggestions for other research practices or policies that data management organizations could implement to improve research quality (3 questions). Block 6 asked participants how concerned they are about research quality, how many relevant studies they have published, what software they use for data analysis, and for any additional comments (4 questions). All rating-scale questions contained the response option _“I don’t understand the question”_. The questions presented in Figure 3 also contained the response option _“Unsure”_. 
+
+## Analyses
+We present the results for closed-ended questions as prevalence rates or counts in Figures 1-3 and Supplementary Material C. When reporting percentages, we collapse together all positive responses on the rating scales (e.g., _“strongly agree”_ and _“somewhat agree”_) as well as all negative responses. The total number of responses differ among questions due to the missing values and responses of _“I don’t understand the question”_ and _“Unsure”_. We narratively synthesize the responses to the open-ended questions in Table 1 (i.e., we provide a non-systematic qualitative summary).
 
 # Results
+## Survey completion
+Of 1148 emails sent, 1094 went through and 54 bounced. The survey was completed `r nrow(processed)` times and partially completed `r nrow(dplyr::filter(processed, has_missing)) ` times, leading to a response rate of `r round(nrow(processed) / 1094 * 100)`% for complete surveys and `r round(nrow(filter(processed, has_missing)) / 1094 * 100)`% for incomplete surveys.\footnote[1]{The ALSPAC mailing list has been maintained as a record of collaborators for many years and is constantly added to. The ALSPAC team only removes email addresses from their mailing list if someone explicitly requests this action. Thus, their list likely includes several email addresses that are no longer monitored. For example, we received one email reply stating that the recipient hasn’t been active in research for 30 years. It is also possible that some researchers have multiple email addresses on the mailing list (e.g., because they moved institutions). These two factors may have deflated the response rate.} The median time taken for complete survey responses was `r round(median(processed$duration_in_mins), 1)` minutes (IQR: `r round(quantile(processed$duration_in_mins, .25, na.rm = TRUE), 1)` to `r round(quantile(processed$duration_in_mins, .75, na.rm = T), 1)`). This manuscript presents the results for complete surveys. Supplementary Material D presents the results with partially complete surveys included. 
+
 ## Participants
 
 ```{r languageDescriptives, include=FALSE}
@@ -189,14 +213,7 @@ concerned <- support_percentage(
 )
 ```
 
-We invited the ALSPAC mailing list to participate, which included 1148 email addresses. 54 emails bounced, leaving 1094 emails that went through. The survey was completed `r nrow(processed)` times and partially completed `r nrow(dplyr::filter(processed, has_missing)) ` times, leading to a response rate of `r round(nrow(processed) / 1094 * 100)`% for complete surveys and `r round(nrow(filter(processed, has_missing)) / 1094 * 100)`% for incomplete surveys.[^1] The median time taken for complete survey responses was `r round(median(processed$duration_in_mins), 1)` minutes (IQR: `r round(quantile(processed$duration_in_mins, .25, na.rm = TRUE), 1)` to `r round(quantile(processed$duration_in_mins, .75, na.rm = T), 1)`).
-
-Respondents published a median of `r median(processed$n_studies)` (IQR `r round(quantile(processed$n_studies, .25, na.rm = TRUE), 1)` to `r round(quantile(processed$n_studies, .75, na.rm = TRUE), 1)`) studies using preexisting observational data (Figure S1). They reported using the programming languages `r language_text` (Table S1)[^2]. `r pull(filter(concerned, support == "positive"), percentage)`% (`r pull(filter(concerned, support == "positive"), n)`/`r pull(filter(concerned, support == "positive"), n_sum)`) of participants reported being more concerned with research trustworthiness, bias, rigour, and reproducibility compared to what they think of as a typical research who uses preexisting observational data (Figure C2); `r pull(filter(concerned, support == "negative"), percentage)`% (`r pull(filter(concerned, support == "negative"), n)`/`r pull(filter(concerned, support == "negative"), n_sum)`) reported being less concerned.
-
-[^1]: The ALSPAC mailing list has been active for >30 years and may contain email addresses that are no longer monitored. For example, we received one email reply stating that the recipient hasn’t been active in research for 30 years. Excluding these email addresses would increase the response rate, but we do not know by how much.
-[^2]: Participants could select multiple responses to this survey question.
-[^3]: The survey defined trustworthy as: “meaning that the results and conclusions of the publications are valid, reliable, rigorous, and accurate. That they merit trust.”
-[^4]: The survey defined reproducible “in the sense that other researchers re-analysing the data with the same research question would produce similar results.”
+Respondents had published a median of `r median(processed$n_studies)` (IQR `r round(quantile(processed$n_studies, .25, na.rm = TRUE), 1)` to `r round(quantile(processed$n_studies, .75, na.rm = TRUE), 1)`) studies using preexisting observational data (Supplementary Figure C1). They reported using the following programming languages or software packages: `r language_text` (Supplementary Table C1)\footnote[2]{Participants could select multiple responses to this survey question.}. `r pull(filter(concerned, support == "positive"), percentage)`% (`r pull(filter(concerned, support == "positive"), n)`/`r pull(filter(concerned, support == "positive"), n_sum)`) of participants reported being more concerned with research trustworthiness, bias, rigour, and reproducibility compared to what they think of as a typical research who uses preexisting observational data; `r pull(filter(concerned, support == "negative"), percentage)`% (`r pull(filter(concerned, support == "negative"), n)`/`r pull(filter(concerned, support == "negative"), n_sum)`) reported being less concerned (Supplementary Figure C2).
 
 ## Survey results
 
@@ -256,7 +273,7 @@ ecaw_reproducible <- support_percentage(
 )
 ```
 
-Most respondents agreed that studies that analyze preexisting observational datasets are trustworthy[^3] (`r pull(filter(typically_trustworthy, support == "positive"), percentage)`%; `r pull(filter(typically_trustworthy, support == "positive"), n)`/`r pull(filter(typically_trustworthy, support == "positive"), n_sum)`) and reproducible[^4] (`r pull(filter(typically_reproducible, support == "positive"), percentage)`%; `r pull(filter(typically_reproducible, support == "positive"), n)`/`r pull(filter(typically_reproducible, support == "positive"), n_sum)`) (Figure 2, top panel). At the same time, many agreed that a study using an ECAW would be _more_ trustworthy (`r pull(filter(ecaw_trustworthy, support == "positive"), percentage)`%; `r pull(filter(ecaw_trustworthy, support == "positive"), n)`/`r pull(filter(ecaw_trustworthy, support == "positive"), n_sum)`) and _more_ reproducible (`r pull(filter(ecaw_reproducible, support == "positive"), percentage)`%; `r pull(filter(ecaw_reproducible, support == "positive"), n)`/`r pull(filter(ecaw_reproducible, support == "positive"), n_sum)`) compared to a typical study using preexisting observational data (Figure 2, bottom panel).
+Most respondents agreed that studies that analyze preexisting observational datasets are trustworthy (`r pull(filter(typically_trustworthy, support == "positive"), percentage)`%; `r pull(filter(typically_trustworthy, support == "positive"), n)`/`r pull(filter(typically_trustworthy, support == "positive"), n_sum)`) and reproducible (`r pull(filter(typically_reproducible, support == "positive"), percentage)`%; `r pull(filter(typically_reproducible, support == "positive"), n)`/`r pull(filter(typically_reproducible, support == "positive"), n_sum)`) (Figure 2, top panel). At the same time, many agreed that a study using an ECAW would be _more_ trustworthy (`r pull(filter(ecaw_trustworthy, support == "positive"), percentage)`%; `r pull(filter(ecaw_trustworthy, support == "positive"), n)`/`r pull(filter(ecaw_trustworthy, support == "positive"), n_sum)`) and _more_ reproducible (`r pull(filter(ecaw_reproducible, support == "positive"), percentage)`%; `r pull(filter(ecaw_reproducible, support == "positive"), n)`/`r pull(filter(ecaw_reproducible, support == "positive"), n_sum)`) compared to a typical study using preexisting observational data (Figure 1, bottom panel).
 
 ```{r typicallyEcawPlot, warning=FALSE, fig.cap="(ref:typicallyEcawPlotCaption)", fig.align="center", out.width="100%", fig.width=12.8, fig.height=6, fig.path='figs/', dev=c('png', 'pdf')}
 # Create typically trustworthy and reproducible plot
@@ -376,7 +393,7 @@ ecaw_plot <-
 typically_plot + ecaw_plot + plot_layout(ncol = 1, nrow = 2)
 ```
 
-(ref:typicallyEcawPlotCaption) __Responses to the survey questions on trustworthiness and reproducibility of observational research with preexisting data and ECAWs.__ The survey defined trustworthy as “meaning that the results and conclusions of the publications are valid, reliable, rigorous, and accurate. That they merit trust”. The survey defined reproducible “in the sense that other researchers re-analysing the data with the same research question would produce similar results.” For each item, the number to the left of the data bar indicates the combined percentage for the responses depicted in any shade of brown/orange. The number in the center of the data bar (gray) indicates the percentage of neutral responses. The number to the right of the data bar indicates the combined percentage for the responses depicted in any shade of green. For the bottom panel we excluded the missing responses (n = `r pull(filter(ecaw_missing, item == "Trustworthy" & value == "Missing"), n)`; `r pull(filter(ecaw_missing, item == "Reproducible" & value == "Missing"), n)`) and responses of “I don't understand the question” (n = `r pull(filter(ecaw_missing, item == "Trustworthy" & value == "I don't understand the question"), n)`; `r pull(filter(ecaw_missing, item == "Reproducible" & value == "I don't understand the question"), n)`).
+(ref:typicallyEcawPlotCaption) __Figure 1. Responses to the survey questions on trustworthiness and reproducibility of observational research with preexisting data and ECAWs.__ The survey defined trustworthy as “meaning that the results and conclusions of the publications are valid, reliable, rigorous, and accurate. That they merit trust”. The survey defined reproducible “in the sense that other researchers re-analysing the data with the same research question would produce similar results.” For each item, the number to the left of the data bar indicates the combined percentage for the responses depicted in any shade of brown/orange. The number in the center of the data bar (gray) indicates the percentage of neutral responses. The number to the right of the data bar indicates the combined percentage for the responses depicted in any shade of green. The bar charts in the top panel had no missing responses or selection of the option _“I don’t understand the question”_. The bar charts in the bottom panel excluded missing responses (n = `r pull(filter(ecaw_missing, item == "Trustworthy" & value == "Missing"), n)`; `r pull(filter(ecaw_missing, item == "Reproducible" & value == "Missing"), n)`) and responses of _“I don't understand the question”_ (n = `r pull(filter(ecaw_missing, item == "Trustworthy" & value == "I don't understand the question"), n)`; `r pull(filter(ecaw_missing, item == "Reproducible" & value == "I don't understand the question"), n)`).
 
 ```{r methodDescriptives, include=FALSE}
 # Define the response level order for these variables
@@ -439,7 +456,7 @@ script <- level_percentage(
 )
 ```
 
-Over half of respondents reported that their studies using preexisting observational data are preregistered never or almost never (`r filter(preregistered, method_preregistered == "Never or almost never") %>% pull(percentage)`%; `r filter(preregistered, method_preregistered == "Never or almost never") %>% pull(n)`/`r filter(preregistered, method_preregistered == "Never or almost never") %>% pull(n_sum)`), or sometimes (`r filter(preregistered, method_preregistered == "Sometimes") %>% pull(percentage)`%; `r filter(preregistered, method_preregistered == "Sometimes") %>% pull(n)`/`r filter(preregistered, method_preregistered == "Sometimes") %>% pull(n_sum)`) (Figure 2A). About half reported sharing their analysis scripts never or almost never (`r filter(script, method_script == "Never or almost never") %>% pull(percentage)`%; `r filter(script, method_script == "Never or almost never") %>% pull(n)`/`r filter(script, method_script == "Never or almost never") %>% pull(n_sum)`), or sometimes (`r filter(script, method_script == "Sometimes") %>% pull(percentage)`%; `r filter(script, method_script == "Sometimes") %>% pull(n)`/`r filter(script, method_script == "Sometimes") %>% pull(n_sum)`) (Figure 3). `r filter(blind, method_blind == "Never or almost never") %>% pull(percentage)`% (`r filter(blind, method_blind == "Never or almost never") %>% pull(n)`/`r filter(blind, method_blind == "Never or almost never") %>% pull(n_sum)`) reported that they never or almost never blind the data analyst (Figure 3). Almost all respondents answered that they use both exploratory (`r pull(exploratory, percentage)`%; `r pull(exploratory, n)`/`r pull(exploratory, n_sum)`) and confirmatory (`r pull(confirmatory, percentage)`%; `r pull(confirmatory, n)`/`r pull(confirmatory, n_sum)`) analyses at least sometimes (Figure 3).
+Over half of respondents reported that their studies using preexisting observational data are preregistered never or almost never (`r filter(preregistered, method_preregistered == "Never or almost never") %>% pull(percentage)`%; `r filter(preregistered, method_preregistered == "Never or almost never") %>% pull(n)`/`r filter(preregistered, method_preregistered == "Never or almost never") %>% pull(n_sum)`), or sometimes (`r filter(preregistered, method_preregistered == "Sometimes") %>% pull(percentage)`%; `r filter(preregistered, method_preregistered == "Sometimes") %>% pull(n)`/`r filter(preregistered, method_preregistered == "Sometimes") %>% pull(n_sum)`) (Figure 2). About half reported sharing their analysis scripts never or almost never (`r filter(script, method_script == "Never or almost never") %>% pull(percentage)`%; `r filter(script, method_script == "Never or almost never") %>% pull(n)`/`r filter(script, method_script == "Never or almost never") %>% pull(n_sum)`), or sometimes (`r filter(script, method_script == "Sometimes") %>% pull(percentage)`%; `r filter(script, method_script == "Sometimes") %>% pull(n)`/`r filter(script, method_script == "Sometimes") %>% pull(n_sum)`). `r filter(blind, method_blind == "Never or almost never") %>% pull(percentage)`% (`r filter(blind, method_blind == "Never or almost never") %>% pull(n)`/`r filter(blind, method_blind == "Never or almost never") %>% pull(n_sum)`) reported that they never or almost never blind the data analyst. Almost all respondents answered that they use both exploratory (`r pull(exploratory, percentage)`%; `r pull(exploratory, n)`/`r pull(exploratory, n_sum)`) and confirmatory (`r pull(confirmatory, percentage)`%; `r pull(confirmatory, n)`/`r pull(confirmatory, n_sum)`) analyses at least sometimes.
 
 ```{r methodPlot, warning=FALSE, fig.cap="(ref:methodPlotCaption)", fig.align="center", out.width="100%", fig.width=11, fig.height=4.5, fig.path='figs/', dev=c('png', 'pdf')}
 # Used methods figures
@@ -530,7 +547,7 @@ method_plot_data %>%
   )
 ```
 
-(ref:methodPlotCaption) __Responses to survey questions about the research practices of participants.__
+(ref:methodPlotCaption) __Figure 2. Responses to survey questions about the research practices of participants.__
 
 ```{r aslpacDescriptives, include=FALSE, warning=FALSE, message=FALSE}
 willing <- support_percentage(
@@ -689,7 +706,10 @@ plot(alspac_plot_likert_data, digits = 1, text.size = 6) +
   )
 ```
 
-(ref:alspacPlotCaption) __Responses to survey questions about using ECAWs.__ For the 4 questions we excluded missing values (_n_ = `r pull(filter(alspac_missing, item == "Less_willing" & value == "Missing"), n)`; `r pull(filter(alspac_missing, item == "Opt_in" & value == "Missing"), n)`; `r pull(filter(alspac_missing, item == "Study" & value == "Missing"), n)`; `r pull(filter(alspac_missing, item == "Prefer_ecaw" & value == "Missing"), n)`), responses of "I don't understand the question" (_n_ = `r pull(filter(alspac_missing, item == "Less_willing" & value == "I don't understand the question"), n)`; `r pull(filter(alspac_missing, item == "Opt_in" & value == "I don't understand the question"), n)`; `r pull(filter(alspac_missing, item == "Study" & value == "I don't understand the question"), n)`; `r pull(filter(alspac_missing, item == "Prefer_ecaw" & value == "I don't understand the question"), n)`), and responses of "Unsure" (_n_ = `r pull(filter(alspac_missing, item == "Less_willing" & value == "Unsure"), n)`; `r pull(filter(alspac_missing, item == "Opt_in" & value == "Unsure"), n)`; `r pull(filter(alspac_missing, item == "Study" & value == "Unsure"), n)`; `r pull(filter(alspac_missing, item == "Prefer_ecaw" & value == "Unsure"), n)`).
+(ref:alspacPlotCaption) __Figure 3. Responses to survey questions about using ECAWs.__ These bar charts exclude missing values (_n_ = `r pull(filter(alspac_missing, item == "Less_willing" & value == "Missing"), n)`; `r pull(filter(alspac_missing, item == "Opt_in" & value == "Missing"), n)`; `r pull(filter(alspac_missing, item == "Study" & value == "Missing"), n)`; `r pull(filter(alspac_missing, item == "Prefer_ecaw" & value == "Missing"), n)`; respectively from top to bottom), responses of _"I don't understand the question"_ (_n_ = `r pull(filter(alspac_missing, item == "Less_willing" & value == "I don't understand the question"), n)`; `r pull(filter(alspac_missing, item == "Opt_in" & value == "I don't understand the question"), n)`; `r pull(filter(alspac_missing, item == "Study" & value == "I don't understand the question"), n)`; `r pull(filter(alspac_missing, item == "Prefer_ecaw" & value == "I don't understand the question"), n)`), and responses of _"Unsure"_ (_n_ = `r pull(filter(alspac_missing, item == "Less_willing" & value == "Unsure"), n)`; `r pull(filter(alspac_missing, item == "Opt_in" & value == "Unsure"), n)`; `r pull(filter(alspac_missing, item == "Study" & value == "Unsure"), n)`; `r pull(filter(alspac_missing, item == "Prefer_ecaw" & value == "Unsure"), n)`). Agreement with the first question may be slightly inflated due to the format of the questions in this block. Respondents with a highly positive inclination towards ECAWs would be expected to disagree with the first question, but agree with the next three questions. Four respondents agreed with all four statements, suggesting they may have glazed over the word “less” in the first question \protect\footnotemark[3]. Interpreting responses to the second and third question come with a degree of ambiguity as the survey did not specify what was meant by the term “study” \protect\footnotemark[4].
+
+\protect\footnotetext[3]{Another four respondents agreed with at least the first and second question, which appear contradictory. We did not preregister these considerations. More careful wording of these questions could have circumvented the ambiguity in interpreting these seemingly contradictory responses.}
+\protect\footnotetext[4]{We intended for these questions to ask about ALSPAC running a trial on ECAWs. However, due to the ambiguity around the terms “study”, some respondents may have interpreted this as a survey, focus group, feasibility, or pilot type of study.}
 
 ```{r include=FALSE}
 # Open ended questions
@@ -700,14 +720,129 @@ open_ended <-
   filter(!is.na(value))
 ```
 
-Table 1. Recurring topics in responses to the open-ended survey questions. The survey included 4 open-ended questions with broad prompts regarding running a study on ECAWs, benefits and drawbacks of ECAWs, related research practices, and general comments. These questions received a total of (`r nrow(open_ended)`) responses from (`r nrow(distinct(open_ended, response_id))`) unique respondents. A complete list of responses are viewable in the open data [LINK]. We synthesized the response to open-ended questions into the 9 topics on the left side of this table. We divide these into three sections: (i) concerns about the acceptability of ECAWs, (ii) concerns that ECAWs will not have their intended impact, and (iii) alternative interventions that may achieve similar goals as typical preregistration and ECAWs. On the right side of the table, we provide a reflection on each topic. 
+__Table 1. Recurring topics in responses to the open-ended survey questions.__ The survey included 4 open-ended questions with broad prompts regarding running a study on ECAWs, benefits and drawbacks of ECAWs, related research practices, and general comments. These questions received a total of (`r nrow(open_ended)`) responses from (`r nrow(distinct(open_ended, response_id))`) unique respondents. A complete list of responses are viewable in the open data [LINK]. We synthesized the responses to open-ended questions into the 9 topics on the left side of this table. We divide these into three sections: (i) concerns about the acceptability of ECAWs, (ii) concerns that ECAWs will not have their intended impact, and (iii) alternative interventions that may achieve similar goals as conventional preregistration and ECAWs. On the right side of the table, we provide our reflection on each topic.
+
+```{r openEndedTable, echo=FALSE, message=FALSE, warnings=FALSE, fig.align = "center", out.width="100%", fig.id=FALSE}
+open_ended_table <- tibble(
+  subheader = c(
+    "Concerns about acceptability",
+    "Concerns about acceptability",
+    "Concerns about acceptability",
+    "Concerns about acceptability",
+    "Concerns about impact",
+    "Concerns about impact",
+    "Alternative interventions",
+    "Alternative interventions",
+    "Alternative interventions"
+    ),
+  `Respondents’ comments` = c(
+      "1. ECAWs would take too much time.",
+      "2. The subset of data would be insufficient for certain applications (e.g., for genome-wide association studies, rare outcomes, questions regarding small sub-samples, and imputation).",
+      "3. Researchers will often have to change their analysis after seeing the full dataset.",
+      "4. Researchers sometimes reuse the same dataset which they will already have full access to.",
+      "5. Researchers can still p-hack / data-dredge when using ECAWs.",
+      "6. Researchers may give findings from the subset too much weight (e.g., by not performing an analysis on the full dataset because it was null in the subset, or vice versa).",
+      "7. Data management organizations should require final analysis scripts to be shared (so that results are reproducible, and easy for other researchers to build on).",
+      "8. Data management organizations should maintain a repository that outlines each research project conducted using their dataset (to reduce duplication and facilitate replication).",
+      "9. Data management organizations could make a synthetic version of their dataset openly available. That dataset could be used for ECAWs."
+      ),
+    `Our reflection` = c(
+      "Compared to a study that is not preregistered, a study using an ECAW could very well take more time—especially at the beginning of the research process when preparing an analysis script. However, the advantages may outweigh the time commitment and further research could help understand this potential tradeoff. One survey suggests that psychology researchers believe that preregistration leads to longer project duration, but also higher research quality (Sarafoglou et al., 2022). Moreover, compared to conventional preregistration, some evidence suggests that an ECAW-like workflow does not take more time (Sarafoglou et al., 2023).",
+      "Our survey suggested providing access to 10% of the dataset in the first ECAW stage. To develop an analysis for certain research questions, this subset of data may be insufficient. In these cases, a larger subset could be provided (e.g., 50%) and the final analysis could be run on the other 50% of the data, rather than the full dataset. Alternatively, the data management organization could create and provide access to a full-sized synthetic dataset.",
+      "ECAWs do not stop researchers from changing their analysis. ECAWs make these changes transparent. This allows others to better assess risk of bias and calibrate their confidence in the study findings. As compared to conventional preregistration, some evidence suggests that an ECAW-like workflow leads to fewer deviations from the analysis plan (Sarafoglou et al., 2023).",
+      "ECAWs do not stop researchers from reusing the same dataset for new analyses. Although, as ECAWs were described in our survey, a research team could only use an ECAW once per dataset (because they will be exposed to the full dataset).\n\nData management organizations could overcome this shortcoming by providing a secure data environment that publicly logs all analyses run, but never exposes the real dataset. Alternatively, they could provide access to only the subset of variables needed for a specific analysis. This would allow researchers to run another ECAW on the same larger dataset—if it focuses on variables not used in their previous ECAW.",
+      "As is the case for conventional preregistration, ECAWs discourage, but do not necessarily prevent p-hacking and data-dredging. ECAWs increase transparency by making these questionable research practices detectable.",
+      "We hope that the instructions provided when implementing ECAWs make it clear that the subset of data is provided to help write an analysis script, but not to help decide which research questions to ask.",
+      "This policy could increase computational reproducibility. However, it may be difficult for data management organizations to implement and to ensure compliance. Whereas data management organizations can withhold access to the full dataset until an analysis script is registered, their influence is less direct at the publication stage.",
+      "Such a repository could be maintained in parallel with the use of ECAWs. It could also be used as a lighter touch intervention that may achieve some of the benefits we presume ECAWs would entail.",
+      "Several initiatives have employed synthetic datasets (e.g., OpenSAFELY, Sarafoglou et al., 2023, Schmidt et al., 2023). On the one hand, creating a synthetic dataset requires more technical knowledge as compared to creating a data subset, and synthetic datasets can obscure the relationships between variables, which some researchers may dislike. On the other hand, they reduce the risk of participant re-identification and provide a full-sized dataset. All considered, synthetic datasets present a reasonable alternative to data subsets."
+      )
+)
+
+
+open_ended_table %>% 
+  group_by(subheader) %>% 
+  gt::gt(.) %>% 
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = list(cells_row_groups(), cells_column_labels())
+    ) %>% 
+  tab_footnote(
+    footnote = "The text in the Respondents’ comments column is synthesized from multiple responses and/or paraphrased. They are not verbatim responses.",
+    locations = cells_column_labels(
+      columns = `Respondents’ comments`
+    )
+  ) %>% 
+  tab_footnote(
+    footnote = "Sarafoglou et al.’s study used a pre-cleaned dataset. We are not aware of data that elucidates the time difference between ECAW-like workflows and conventional preregistration when starting from raw data.",
+    locations = cells_body(
+      columns = `Our reflection`,
+      rows = 1
+      )
+  ) %>% 
+  tab_options(table.width = pct(90)) %>% 
+  gtsave("figs/open-ended-table_figure.png", expand = c(0, 100, 0, 100), zoom = 2, vwidth = 1300)
+
+knitr::include_graphics("figs/open-ended-table_figure.png", dpi = 300)
+```
 
 ## Exploratory analyses
+Results can be explored interactively at [TEMPORARY LINK], or by running the code available at [INSERT DATA LINK]. Based on the sample size of 107 participants and a lack of visually striking differences when exploring subsets of respondents, we do not report further on exploratory analyses.
 
 # Discussion
+The survey results suggest that a trial of ECAWs with ALSPAC could be feasible for at least three reasons. First, ECAWs are possible because most respondents reported performing confirmatory analyses with analysis scripts written using programming languages. Second, ECAWs are relevant because many respondents reported limited use of other methods to improve rigour and reproducibility—including preregistration, sharing analysis scripts, and blinding analysts. Moreover, although participants generally agreed that findings from observational research using pre-existing data are trustworthy and reproducible, they also believed that ECAWs would make research findings more trustworthy and more reproducible. Third, ECAWs appear relatively acceptable. For example, only 10% of respondents disagreed that ALSPAC should run a study on ECAWs, and 25% agreed that they would be less likely to use the ALSPAC dataset if they were required to use an ECAW.
 
-# Acknowledgements
+The open-ended responses revealed interest in policies and interventions with similar goals to ECAWs. These include requirements for the sharing of final analysis scripts, a database of all ongoing studies that use a particular dataset, and openly available synthetic datasets. 
 
+## Limitations
+Given the response rate of 10%, our results represent the opinions of a select set of researchers who may be more interested and involved in reproducible research practices. Indeed, respondents themselves believed that they were more concerned about reproducibility than other researchers in their field (Supplementary Figure C2). ECAWs may be less acceptable among non-responders and non-response may be a mark of lack of interest in the concept. Nonetheless, the absolute number of responders suggests that there is an audience of researchers who might be interested to pursue this approach.
+
+The survey results are best understood as the initial thoughts of participants when introduced to the concept of ECAWs. The median response time was 7.2 minutes (IQR: 4.3 to 13.1) for a survey that included over 20 questions and a 500-word description of ECAWs. Thus, it is unlikely that respondents spent much time reflecting on ECAWs and their implications.
+
+We invited researchers from the ALSPAC mailing list which includes researchers across the fields of health and social sciences, but we did not record the specific disciplines in which the respondents were active. Thus, while ECAWs may be more relevant to some disciplines, the present survey does delve into the idiosyncrasies among disciplines. 
+
+Data management organizations could vary widely in their implementation of ECAWs. For example, they could perform checks on the analysis scripts to ensure they run and they could require commented analysis scripts with a clear indication of the primary outcomes. Our survey results do not elucidate the best implementation of ECAWs.
+
+## Recommendations
+Some data management organizations looking to implement ECAWs will need to consider a balance between updating their data access workflow and maintaining their user numbers, engagement, and funding. This consideration will depend heavily on the structure of the data management organization. An organization managing data that is routinely collected somewhat regardless of its potential for use in research (e.g., electronic health records) may have leeway to test new workflows even if they impact user numbers. Other organizations—such as ALSPAC—coordinate ongoing data collection efforts that compound the value of their dataset and their continued operation remains contingent on funding cycles and data access fees. Even if ECAWs led to an increase in user numbers in the long-term, a temporary decrease could preclude the cost recovery systems on which their staff rely. In a more extreme case, the likelihood of another successful funding cycle could be impacted and compromise the project’s continuation. Funders and institutions interested in supporting these types of initiatives could alleviate concerns by providing targeted funding for testing these interventions and offering contingency funds to maintain cost recovery systems. 
+
+With these considerations in mind, an organization like ALSPAC may benefit from first leveraging the substantial number of respondents who would opt-in to a study on ECAWs. Trialing ECAWs with this user group would allow organizations to collect data that may support more widespread implementation, including project completion time, study quality, and researcher satisfaction when using ECAWs. They could refine the ECAW pipeline with minimal concern about user numbers. In the situation that a data management organization is already considering implementing policies on preregistration, they may benefit from considering alternate workflows such as ECAWs, which many respondents deemed preferable to conventional preregistration. The open-ended responses to our survey also suggest some confusion around the purpose of ECAWs and the process of using them. A clear-cut module provided by data management organizations that explains the ECAW concept alongside step-by-step instructions could help address researchers’ concerns preemptively and help them adopt this workflow. 
+
+The stakes are lower in cases where a static final dataset already exists and concerns about funding are absent. For example, researchers with an interest in rigorous analyses and who control access to a dataset have already employed ECAW-like workflows (e.g., @Forscher2020; @Schmidt2023). Concerns about a reduction in user numbers and engagement may also be less relevant for datasets containing unique data. For example, a researcher trying to answer a question about health and development with ALSPAC data, may also be able to answer that question with another cohort dataset. However, a researcher trying to answer a question about the population of a specific country may need access to that country’s census data, regardless of the workflow required by that data management organization. A final consideration is that user numbers and engagement may increase if researchers feel that ECAWs increase the trustworthiness of their findings and others come to associate research from datasets using ECAWs as more open and rigorous.
+
+## Conclusion
+In this manuscript, we outlined a research workflow—ECAW—which necessitates certain open science practices and can be implemented by data management organizations. Responses to our survey provide information for organizations interested in developing and testing ECAWs and interventions with related goals.
+
+---
+
+## Ethical approval
+Ethical approval for the study was obtained from the ALSPAC Ethics and Law Committee and the Faculty of Life Sciences Research Ethics Committee at the University of Bristol (approval code: 12260).
+
+## Acknowledgements
+We thank Nicholas Timpson and Kate Northstone for invaluable input throughout this research project. We thank the ALSPAC Executive for their collaboration and willingness to run this study. We thank all the participants for their responses.
+
+## Funding
+Robert Thibault is supported by a general support grant awarded to METRICS from Arnold Ventures and a postdoctoral fellowship from the Canadian Institutes of Health Research. Alexandra Sarafoglou was supported by an Amsterdam Brain and Cognition project grant (grant ref: ABC PG 22 - January 2022) ``From rigid theory to cognitive models: a framework to study individual differences in meaning representations’’. The UK Medical Research Council and Wellcome (Grant ref: 217065/Z/19/Z) and the University of Bristol provide core support for ALSPAC. This publication is the work of the authors and Robert Thibault will serve as guarantor for the contents of this paper. The funders have no role in the preparation of this manuscript or the decision to publish.
+
+## Contributions
+__Conceptualization:__ Robert T. Thibault and Marcus R. Munafò.
+__Data curation:__ Marton Kovacs.
+__Formal analysis:__ Robert T. Thibault and Marton Kovacs.
+__Funding acquisition:__ Robert T. Thibault and John P. A. Ioannidis.
+__Investigation:__ Robert T. Thibault.
+__Methodology:__ Robert T. Thibault, Tom E. Hardwicke, Alexandra Sarafoglou, John P. A. Ioannidis, and Marcus R. Munafò.
+__Project administration:__ Robert T. Thibault.
+__Resources:__ Robert T. Thibault.
+__Software:__ Marton Kovacs.
+__Supervision:__ Robert T. Thibault and Marcus R. Munafò.
+__Validation:__ Robert T. Thibault and Marton Kovacs.
+__Visualization:__ Robert T. Thibault and Marton Kovacs.
+__Writing - original draft:__ Robert T. Thibault.
+__Writing - review & editing:__ Robert T. Thibault, Marton Kovacs, Tom E. Hardwicke, Alexandra Sarafoglou, John P. A. Ioannidis, and Marcus R. Munafò.
+
+
+## Competing interests
+All authors declare no conflict of interest.
 
 \newpage
 

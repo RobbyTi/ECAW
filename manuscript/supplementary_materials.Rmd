@@ -1,6 +1,70 @@
-# Supplementary materials C
+# Supplementary Material A. Deviations from the preregistration.
 
-```{r numStudiesPlot, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=6, fig.height=3.2, fig.path='figs/', dev=c('png', 'pdf')}
+\begin{enumerate}
+  \item We rephrased our second objective to be more accurate. The preregistration reads “2.	To use these insights to inform future research on how data management organizations can encourage rigorous and reproducible research practices (survey Blocks 3-6). This objective includes assessing and refining potential interventions—such as ECAWs—and assessing their acceptability. ”. The manuscript reads “(2) To use these insights to inform future research—including a potential trial of ECAWs with the Avon Longitudinal Study of Parents and Children (ALSPAC)—on how data management organizations can encourage rigorous and reproducible research practices.”
+  \item Marton Kovacs was added as a contributor during data collection. This led to a few of the projected contributor roles outlined in the preregistration to be different from the final contributor roles outlined in the manuscript.
+  \item The preregistration stated that: “We will tabulate descriptive summary statistics for all the survey questions.” Instead of tabulating the results, the manuscript presents this data in figures. We feel that the figures are easier to digest as compared to tabulated data.
+  \item The preregistration stated that: “we   will   present   results   that   include   responses   from participants who did not complete the entire survey, alongside the associated response rate for each question.”. The results from all participants are presented in Supplementary Material D. However, instead of reporting the associated response rate for each question, we simply state that “The survey was completed 107 times and partially completed 27 times, leading to a response rate of 10% for complete surveys and 12% for incomplete surveys.”
+  \item The preregistration and survey use the term “typical preregistration”. We changed this to “conventional preregistration” in the manuscript because we believe it is the more appropriate term.
+  \item We performed a brief visual inspection of the data presented in spreadsheet format. Three participants clicked through to the end of the survey—so they were coded as completing the survey—however, they only responded to a few of the first questions. One other participant appears to have provided non-sincere responses in that all their responses were neutral or skipped and they completed the survey in 146 seconds. We retained these four participants as partially completed responses (results in Supplementary Material D), but removed them from the main dataset. These decisions were not preregistered.
+  \item We did not preregister which results we would present in the abstract. We decided to report the results with the highest and lowest percentage about the acceptability of ECAWs: “For example, only 10% of respondents disagreed that ALSPAC should run a study on ECAWs, but as many as 25% of respondents agreed they would be less willing to use ALSPAC data if they were required to use an ECAW.”
+\end{enumerate}
+
+\pagebreak
+
+# Supplementary Material B. Invitation email
+
+## Original email
+
+Dear ALSPAC Data User,
+ 
+We are working with Dr Robert Thibault, a postdoctoral scholar at Stanford University and the University of Bristol, to support his work on scientific rigour and reproducibility in observational studies. 
+ 
+To assist him in his research we would be very grateful if you would consider completing a short survey. The purpose of this is to understand researcher’s practices and thoughts regarding the rigour and reproducibility of observational research that uses pre-existing datasets (such as the ALSPAC resource). Results from this survey may be used in the future to inform initiatives for ALSPAC to better serve our users and to maximise the quality of the research using ALSPAC.
+ 
+The survey has 21 questions across six sections. It will be open until November 1 at this link: https://bristolexppsych.eu.qualtrics.com/jfe/form/SV_3mVgk4lzXx4kp02. It will take approximately 10-20 minutes to complete. The data you provide is completely anonymous and further information is available on the consent form at the start of the survey.
+ 
+If you have any questions or comments, please send them directly to Robert (robert.thibault@bristol.ac.uk).
+
+Kind regards,
+ 
+The ALSPAC Executive
+
+---
+
+## First follow-up email (sent after 1 week)
+
+Dear ALSPAC data user,
+
+Thankyou very much to those of you who have already completed the survey below.
+There is still time to complete the survey (see details in the original email below), which closes of November 1st.
+ 
+Please send any comments or queries directly to Robert (robert.thibault@bristol.ac.uk). 
+ 
+Many thanks,
+ 
+The ALSPAC Executive
+
+---
+
+## Second follow-up email (sent after 2 weeks)
+
+Dear ALSPAC data user,
+ 
+Thank you very much to those of you who have already completed the survey below.
+This will be our final email inviting you to complete the survey (see details in the original email below), which closes of November 1st.
+ 
+The median time to complete the survey has been 8 minutes.
+ 
+Please send any comments or queries directly to Robert (robert.thibault@bristol.ac.uk). 
+Many thanks,
+The ALSPAC Executive
+
+\pagebreak
+
+## Supplementary Material C. Participant Characteristics
+
+```{r numStudiesPlot, fig.align="center", out.width="100%", fig.width=6, fig.height=3.2, fig.path='figs/', dev=c('png', 'pdf')}
 # Create text for missing responses
 n_studies_missing_text <- 
   processed %>% 
@@ -78,9 +142,9 @@ processed %>%
   collapse_rows(columns = 1, valign = "top", latex_hline = "major", row_group_label_position = "identity")
 ```
 
-(ref:table1c-caption) What programming language or software do you use for your analyses of preexisting observational data?
+(ref:table1c-caption) __Table C1. “What programming language or software do you use for your analyses of preexisting observational data? (you may select multiple answers)”__
 
-```{r concernedPlot, warning=FALSE, fig.cap="Caption goes here...", fig.align="center", out.width="100%", fig.width=10, fig.height=4, fig.path='figs/', dev=c('png', 'pdf')}
+```{r concernedPlot, warning=FALSE, fig.cap="(ref:concernedPlotCaption)", fig.align="center", out.width="100%", fig.width=10, fig.height=4, fig.path='figs/', dev=c('png', 'pdf')}
 # Concerned figure data preparation
 concerned_plot_data <-
   processed %>% 
@@ -130,4 +194,9 @@ plot(concerned_likert_plot_data, digits = 1, text.size = 6, group.order = names(
     legend.title = element_blank()
   )
 ```
+
+(ref:concernedPlotCaption) __Figure C1. Responses to survey question about number of relevant publications__
+
+## Supplementary Material D. Figures and Tables including participants who partially complete the survey
+
 
