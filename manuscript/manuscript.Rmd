@@ -41,7 +41,7 @@ abstract: |
   \textbf{Background.} Although preregistration can reduce researcher bias and increase transparency in primary research settings, it is less applicable to secondary data analysis. An alternative method that affords additional protection from researcher bias, which cannot be gained from conventional forms of preregistration alone, is an Explore and Confirm Analysis Workflow (ECAW). In this workflow, a data management organization initially provides access to only a subset of their dataset to researchers who request it. The researchers then prepare an analysis script based on the subset of data, upload the analysis script to a registry, and then receive access to the full dataset. ECAWs aim to achieve similar goals as preregistration, but make access to the full dataset contingent on compliance. The present survey aimed to garner information from the research community where ECAWs could be applied—employing the Avon Longitudinal Study of Parents and Children (ALSPAC) as a case example. \hfill \break \hfill \break \textbf{Methods.} We emailed a web-based survey to researchers who had previously applied for access to ALSPAC’s transgenerational observational dataset.\hfill \break \hfill \break \textbf{Results}. We received 107 responses, for a 10% response rate. The results suggest that—at least among our sample of respondents—ECAWs hold the potential to serve their intended purpose and appear relatively acceptable. For example, only 10% of respondents disagreed that ALSPAC should run a study on ECAWs (versus 55% who agreed). However, as many as 25% of respondents agreed that they would be less willing to use ALSPAC data if they were required to use an ECAW (versus 44% who disagreed).\hfill \break \hfill \break \textbf{Conclusion.} Our data and findings provide information for organizations and individuals interested in implementing ECAWs and related interventions. \hfill \break \hfill \break \textbf{Preregistration:} https://osf.io/g2fw5 Deviations from the preregistration are outlined in Supplementary Material A.
   
 keywords          : "Blind data analysis; preregistration; ALSPAC; meta-research; open science; Explore and Confirm Analysis Workflow (ECAW)"
-wordcount         : "3546"
+wordcount         : "4020"
 bibliography      : "ecaw-ref.bib"
 floatsintext      : yes
 linenumbers       : yes
@@ -107,6 +107,7 @@ xfun::Rscript_call(
 
 ```{r loadingData}
 processed <- read_csv(here::here("data/processed/ecaw_processed_data.csv"))
+processed_all <- read_csv(here::here("data/processed/ecaw_processed_all_data.csv"))
 ```
 
 ```{r analysisPreferences}
@@ -407,7 +408,7 @@ method_levels <- c(
   "Missing"
 )
 
-# Calculate the fequency and proportion of responses for each response level
+# Calculate the frequency and proportion of responses for each response level
 confirmatory <- level_percentage(
   processed,
   method_confirmatory,
@@ -858,4 +859,3 @@ All authors declare no conflict of interest.
 
 ```{r child = "supplementary_materials.Rmd"}
 ```
-

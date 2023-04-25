@@ -1,43 +1,45 @@
-description,var_name,has_missing,duration_in_mins
-Response ID,response_id,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
+description,var_name
+Response ID,response_id
 "Typically, studies that analyze preexisting observational datasets (such as the ALSPAC dataset) are:
 
 Trustworthy—meaning that the results and conclusions of the publications are valid, reliable, rigorous, and accurate. That they merit trust.
 
-Reproducible—in the sense that other researchers re-analysing the data with the same research question would produce similar results. - Trustworthy",typically_trustworthy,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
+Reproducible—in the sense that other researchers re-analysing the data with the same research question would produce similar results. - Trustworthy",typically_trustworthy
 "Typically, studies that analyze preexisting observational datasets (such as the ALSPAC dataset) are:
 
 Trustworthy—meaning that the results and conclusions of the publications are valid, reliable, rigorous, and accurate. That they merit trust.
 
-Reproducible—in the sense that other researchers re-analysing the data with the same research question would produce similar results. - Reproducible",typically_reproducible,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
-The studies using preexisting observational data that I am involved in... - Are preregistered,method_preregistered,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
-"The studies using preexisting observational data that I am involved in... - Blind the data analyst (e.g., by masking labels for categorical variables of interest)",method_blind,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
-The studies using preexisting observational data that I am involved in... - Share analysis scripts in an openly accessible repository,method_script,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
-The studies using preexisting observational data that I am involved in... - Contain confirmatory analyses,method_confirmatory,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
-The studies using preexisting observational data that I am involved in... - Contain exploratory analyses,method_exploratory,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
+Reproducible—in the sense that other researchers re-analysing the data with the same research question would produce similar results. - Reproducible",typically_reproducible
+The studies using preexisting observational data that I am involved in... - Are preregistered,method_preregistered
+"The studies using preexisting observational data that I am involved in... - Blind the data analyst (e.g., by masking labels for categorical variables of interest)",method_blind
+The studies using preexisting observational data that I am involved in... - Share analysis scripts in an openly accessible repository,method_script
+The studies using preexisting observational data that I am involved in... - Contain confirmatory analyses,method_confirmatory
+The studies using preexisting observational data that I am involved in... - Contain exploratory analyses,method_exploratory
 "Compared to a typical study using preexisting observational data, a study using an ECAW would be...
 
 Trustworthy—meaning, that the results and conclusions of the publications are valid, reliable, rigorous, and accurate. That they merit trust.
 
-Reproducible—in the sense that other researchers re-analysing the data with the same research question would produce similar results. - Trustworthy",ecaw_trustworthy,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
+Reproducible—in the sense that other researchers re-analysing the data with the same research question would produce similar results. - Trustworthy",ecaw_trustworthy
 "Compared to a typical study using preexisting observational data, a study using an ECAW would be...
 
 Trustworthy—meaning, that the results and conclusions of the publications are valid, reliable, rigorous, and accurate. That they merit trust.
 
-Reproducible—in the sense that other researchers re-analysing the data with the same research question would produce similar results. - Reproducible",ecaw_reproducible,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
-"Thinking about a study you may run with ALSPAC data (or one that you have recently run)... - If ALSPAC required that I use an ECAW, I would be less willing to use their data in my research",alspac_less_willing,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
-"Thinking about a study you may run with ALSPAC data (or one that you have recently run)... - If ALSPAC ran a study on ECAWs, I would opt-in.",alspac_opt_in,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
-Thinking about a study you may run with ALSPAC data (or one that you have recently run)... - ALSPAC should run a study on ECAWs.,alspac_study,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
-Thinking about a study you may run with ALSPAC data (or one that you have recently run)... - I would prefer using an ECAW than using typical preregistration,alspac_prefer_ecaw,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
+Reproducible—in the sense that other researchers re-analysing the data with the same research question would produce similar results. - Reproducible",ecaw_reproducible
+"Thinking about a study you may run with ALSPAC data (or one that you have recently run)... - If ALSPAC required that I use an ECAW, I would be less willing to use their data in my research",alspac_less_willing
+"Thinking about a study you may run with ALSPAC data (or one that you have recently run)... - If ALSPAC ran a study on ECAWs, I would opt-in.",alspac_opt_in
+Thinking about a study you may run with ALSPAC data (or one that you have recently run)... - ALSPAC should run a study on ECAWs.,alspac_study
+Thinking about a study you may run with ALSPAC data (or one that you have recently run)... - I would prefer using an ECAW than using typical preregistration,alspac_prefer_ecaw
 "Optional Question.
-If you disagreed or are unsure about any of these four questions, please explain why here.",unsure_explain,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
+If you disagreed or are unsure about any of these four questions, please explain why here.",unsure_explain
 "Optional Question.
-Do you have any thoughts you would like to share regarding the benefits and drawbacks of an ECAW, or about how this workflow could be improved? Do you have any reservations about this workflow? Would you need additional incentives to use this workflow? What type of incentives would you want? Respond to as many or as few of these questions as you would like.",drawback_ecaw,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
+Do you have any thoughts you would like to share regarding the benefits and drawbacks of an ECAW, or about how this workflow could be improved? Do you have any reservations about this workflow? Would you need additional incentives to use this workflow? What type of incentives would you want? Respond to as many or as few of these questions as you would like.",drawback_ecaw
 "Optional Question.
-Do you have any suggestions for other research practices or policies that data managent organisations could implement to improve the quality of work output from their dataset?",suggestions,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
-May the research team contact you about potential focus groups related to the themes of this survey.,contact,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
-"Compared to what you think of as a typical researcher who uses preexisting observational data in your field, how concerned are you with research trustworthiness, bias, rigour, and reproducibility.",concerned,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
-"Approximately how many studies have you published using a preexisting observational dataset (e.g., the ALSPAC dataset)?",n_studies,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
-What programming language or software do you use for your analyses of preexisting observational data? (you may select multiple answers) - Selected Choice,programming_language,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
+Do you have any suggestions for other research practices or policies that data managent organisations could implement to improve the quality of work output from their dataset?",suggestions
+May the research team contact you about potential focus groups related to the themes of this survey.,contact
+"Compared to what you think of as a typical researcher who uses preexisting observational data in your field, how concerned are you with research trustworthiness, bias, rigour, and reproducibility.",concerned
+"Approximately how many studies have you published using a preexisting observational dataset (e.g., the ALSPAC dataset)?",n_studies
+What programming language or software do you use for your analyses of preexisting observational data? (you may select multiple answers) - Selected Choice,programming_language
 "Optional Question.
-If you have any additional comments regarding this survey, please enter them below.",comments,True if respondent has any missing responses.,Time spent from opening the survey to closing it in minutes.
+If you have any additional comments regarding this survey, please enter them below.",comments
+True if respondent has any missing responses.,has_missing
+Time spent from opening the survey to closing it in minutes.,duration_in_mins
