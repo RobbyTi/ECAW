@@ -66,16 +66,25 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+# Used for rendering the manuscript rmarkdown document
 library("papaja")
+# Used for general data wrangling
 library(tidyverse)
+# Used to make exact file paths
 library(here)
+# Used for tables
 library(kableExtra)
 library(gt)
+# Used for joining figures
 library(patchwork)
 # The developer version is needed
+# Used for creating Likert ggplots
 library(likert)
+# Used for knitting rmarkdown documents
 library(knitr)
+# Used for colorblind ggplot colors
 library(viridis)
+# References
 r_refs("ecaw-ref.bib")
 ```
 
@@ -106,13 +115,9 @@ xfun::Rscript_call(
 ```
 
 ```{r loadingData}
+# Loading processed datafiles
 processed <- read_csv(here::here("data/processed/ecaw_processed_data.csv"))
 processed_all <- read_csv(here::here("data/processed/ecaw_processed_all_data.csv"))
-```
-
-```{r analysisPreferences}
-# Seed for random number generation
-knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
 ```
 
 # Introduction
@@ -175,7 +180,7 @@ We present the results for closed-ended questions as prevalence rates or counts 
 
 # Results
 ## Survey completion
-Of 1148 emails sent, 1094 went through and 54 bounced. The survey was completed `r nrow(processed)` times and partially completed `r nrow(dplyr::filter(processed, has_missing)) ` times, leading to a response rate of `r round(nrow(processed) / 1094 * 100)`% for complete surveys and `r round(nrow(filter(processed, has_missing)) / 1094 * 100)`% for incomplete surveys.\footnote[1]{The ALSPAC mailing list has been maintained as a record of collaborators for many years and is constantly added to. The ALSPAC team only removes email addresses from their mailing list if someone explicitly requests this action. Thus, their list likely includes several email addresses that are no longer monitored. For example, we received one email reply stating that the recipient hasn’t been active in research for 30 years. It is also possible that some researchers have multiple email addresses on the mailing list (e.g., because they moved institutions). These two factors may have deflated the response rate.} The median time taken for complete survey responses was `r round(median(processed$duration_in_mins), 1)` minutes (IQR: `r round(quantile(processed$duration_in_mins, .25, na.rm = TRUE), 1)` to `r round(quantile(processed$duration_in_mins, .75, na.rm = T), 1)`). This manuscript presents the results for complete surveys. Supplementary Material D presents the results with partially complete surveys included. 
+Of 1148 emails sent, 1094 went through and 54 bounced. The survey was completed `r nrow(processed)` times and partially completed `r nrow(processed_all) - nrow(processed)` times, leading to a response rate of `r round(nrow(processed) / 1094 * 100)`% for complete surveys and `r round(nrow(processed_all) / 1094 * 100)`% for at least partially complete surveys.\footnote[1]{The ALSPAC mailing list has been maintained as a record of collaborators for many years and is constantly added to. The ALSPAC team only removes email addresses from their mailing list if someone explicitly requests this action. Thus, their list likely includes several email addresses that are no longer monitored. For example, we received one email reply stating that the recipient hasn’t been active in research for 30 years. It is also possible that some researchers have multiple email addresses on the mailing list (e.g., because they moved institutions). These two factors may have deflated the response rate.} The median time to complete the survey was `r round(median(processed$duration_in_mins), 1)` minutes (IQR: `r round(quantile(processed$duration_in_mins, .25, na.rm = TRUE), 1)` to `r round(quantile(processed$duration_in_mins, .75, na.rm = T), 1)`). This manuscript presents the results for complete surveys. Supplementary Material D presents the results with partially complete surveys included. 
 
 ## Participants
 
@@ -214,7 +219,7 @@ concerned <- support_percentage(
 )
 ```
 
-Respondents had published a median of `r median(processed$n_studies)` (IQR `r round(quantile(processed$n_studies, .25, na.rm = TRUE), 1)` to `r round(quantile(processed$n_studies, .75, na.rm = TRUE), 1)`) studies using preexisting observational data (Supplementary Figure C1). They reported using the following programming languages or software packages: `r language_text` (Supplementary Table C1)\footnote[2]{Participants could select multiple responses to this survey question.}. `r pull(filter(concerned, support == "positive"), percentage)`% (`r pull(filter(concerned, support == "positive"), n)`/`r pull(filter(concerned, support == "positive"), n_sum)`) of participants reported being more concerned with research trustworthiness, bias, rigour, and reproducibility compared to what they think of as a typical research who uses preexisting observational data; `r pull(filter(concerned, support == "negative"), percentage)`% (`r pull(filter(concerned, support == "negative"), n)`/`r pull(filter(concerned, support == "negative"), n_sum)`) reported being less concerned (Supplementary Figure C2).
+Respondents had published a median of `r median(processed$n_studies, na.rm = TRUE)` (IQR `r round(quantile(processed$n_studies, .25, na.rm = TRUE))` to `r round(quantile(processed$n_studies, .75, na.rm = TRUE))`) studies using preexisting observational data (Supplementary Figure C1). They reported using the following programming languages or software packages: `r language_text` (Supplementary Table C1)\footnote[2]{Participants could select multiple responses to this survey question.}. `r pull(filter(concerned, support == "positive"), percentage)`% (`r pull(filter(concerned, support == "positive"), n)`/`r pull(filter(concerned, support == "positive"), n_sum)`) of participants reported being more concerned with research trustworthiness, bias, rigour, and reproducibility compared to what they think of as a typical research who uses preexisting observational data; `r pull(filter(concerned, support == "negative"), percentage)`% (`r pull(filter(concerned, support == "negative"), n)`/`r pull(filter(concerned, support == "negative"), n_sum)`) reported being less concerned (Supplementary Figure C2).
 
 ## Survey results
 
@@ -394,7 +399,7 @@ ecaw_plot <-
 typically_plot + ecaw_plot + plot_layout(ncol = 1, nrow = 2)
 ```
 
-(ref:typicallyEcawPlotCaption) __Figure 1. Responses to the survey questions on trustworthiness and reproducibility of observational research with preexisting data and ECAWs.__ The survey defined trustworthy as “meaning that the results and conclusions of the publications are valid, reliable, rigorous, and accurate. That they merit trust”. The survey defined reproducible “in the sense that other researchers re-analysing the data with the same research question would produce similar results.” For each item, the number to the left of the data bar indicates the combined percentage for the responses depicted in any shade of brown/orange. The number in the center of the data bar (gray) indicates the percentage of neutral responses. The number to the right of the data bar indicates the combined percentage for the responses depicted in any shade of green. The bar charts in the top panel had no missing responses or selection of the option _“I don’t understand the question”_. The bar charts in the bottom panel excluded missing responses (n = `r pull(filter(ecaw_missing, item == "Trustworthy" & value == "Missing"), n)`; `r pull(filter(ecaw_missing, item == "Reproducible" & value == "Missing"), n)`) and responses of _“I don't understand the question”_ (n = `r pull(filter(ecaw_missing, item == "Trustworthy" & value == "I don't understand the question"), n)`; `r pull(filter(ecaw_missing, item == "Reproducible" & value == "I don't understand the question"), n)`).
+(ref:typicallyEcawPlotCaption) __Figure 1. Responses to the survey questions on trustworthiness and reproducibility of observational research with preexisting data and ECAWs.__ The survey defined trustworthy as “meaning that the results and conclusions of the publications are valid, reliable, rigorous, and accurate. That they merit trust”. The survey defined reproducible “in the sense that other researchers re-analysing the data with the same research question would produce similar results.” For each item, the number to the left of the data bar indicates the combined percentage for the responses depicted in any shade of brown/orange. The number in the center of the data bar (gray) indicates the percentage of neutral responses. The number to the right of the data bar indicates the combined percentage for the responses depicted in any shade of green. The bar charts in the top panel had no missing responses or selection of the option _“I don’t understand the question”_. The bar charts in the bottom panel excluded responses of _“I don't understand the question”_ (n = `r pull(filter(ecaw_missing, item == "Trustworthy"), n)`; `r pull(filter(ecaw_missing, item == "Reproducible"), n)`).
 
 ```{r methodDescriptives, include=FALSE}
 # Define the response level order for these variables
@@ -505,18 +510,6 @@ method_plot_data <-
     percentage = n / sum(n)
   ) %>%
   ungroup()
-
-# method_missing_data <-
-#   method_data %>%
-#   filter(scale %in% c("Missing", "I don't understand the question")) %>%
-#   mutate(
-#     scale = case_when(
-#       scale == "I don't understand the question" ~ "Don't understand",
-#       scale == "Missing" ~ "Missing"),
-#     text = paste0(scale, ": ", n)
-#     ) %>%
-#   group_by(type) %>%
-#   summarise(text = stringr::str_c(text, collapse = "\n"))
 
 method_plot_data %>%
   # filter(scale %ni% c("Missing", "I don't understand the question")) %>%
@@ -707,7 +700,7 @@ plot(alspac_plot_likert_data, digits = 1, text.size = 6) +
   )
 ```
 
-(ref:alspacPlotCaption) __Figure 3. Responses to survey questions about using ECAWs.__ These bar charts exclude missing values (_n_ = `r pull(filter(alspac_missing, item == "Less_willing" & value == "Missing"), n)`; `r pull(filter(alspac_missing, item == "Opt_in" & value == "Missing"), n)`; `r pull(filter(alspac_missing, item == "Study" & value == "Missing"), n)`; `r pull(filter(alspac_missing, item == "Prefer_ecaw" & value == "Missing"), n)`; respectively from top to bottom), responses of _"I don't understand the question"_ (_n_ = `r pull(filter(alspac_missing, item == "Less_willing" & value == "I don't understand the question"), n)`; `r pull(filter(alspac_missing, item == "Opt_in" & value == "I don't understand the question"), n)`; `r pull(filter(alspac_missing, item == "Study" & value == "I don't understand the question"), n)`; `r pull(filter(alspac_missing, item == "Prefer_ecaw" & value == "I don't understand the question"), n)`), and responses of _"Unsure"_ (_n_ = `r pull(filter(alspac_missing, item == "Less_willing" & value == "Unsure"), n)`; `r pull(filter(alspac_missing, item == "Opt_in" & value == "Unsure"), n)`; `r pull(filter(alspac_missing, item == "Study" & value == "Unsure"), n)`; `r pull(filter(alspac_missing, item == "Prefer_ecaw" & value == "Unsure"), n)`). Agreement with the first question may be slightly inflated due to the format of the questions in this block. Respondents with a highly positive inclination towards ECAWs would be expected to disagree with the first question, but agree with the next three questions. Four respondents agreed with all four statements, suggesting they may have glazed over the word “less” in the first question \protect\footnotemark[3]. Interpreting responses to the second and third question come with a degree of ambiguity as the survey did not specify what was meant by the term “study” \protect\footnotemark[4].
+(ref:alspacPlotCaption) __Figure 3. Responses to survey questions about using ECAWs.__ These bar charts exclude responses of _"I don't understand the question"_ (_n_ = `r pull(filter(alspac_missing, item == "Less_willing" & value == "I don't understand the question"), n)`; `r pull(filter(alspac_missing, item == "Opt_in" & value == "I don't understand the question"), n)`; `r pull(filter(alspac_missing, item == "Study" & value == "I don't understand the question"), n)`; `r pull(filter(alspac_missing, item == "Prefer_ecaw" & value == "I don't understand the question"), n)`; respectively from top to bottom), and responses of _"Unsure"_ (_n_ = `r pull(filter(alspac_missing, item == "Less_willing" & value == "Unsure"), n)`; `r pull(filter(alspac_missing, item == "Opt_in" & value == "Unsure"), n)`; `r pull(filter(alspac_missing, item == "Study" & value == "Unsure"), n)`; `r pull(filter(alspac_missing, item == "Prefer_ecaw" & value == "Unsure"), n)`). Agreement with the first question may be slightly inflated due to the format of the questions in this block. Respondents with a highly positive inclination towards ECAWs would be expected to disagree with the first question, but agree with the next three questions. Four respondents agreed with all four statements, suggesting they may have glazed over the word “less” in the first question \protect\footnotemark[3]. Interpreting responses to the second and third question come with a degree of ambiguity as the survey did not specify what was meant by the term “study” \protect\footnotemark[4].
 
 \protect\footnotetext[3]{Another four respondents agreed with at least the first and second question, which appear contradictory. We did not preregister these considerations. More careful wording of these questions could have circumvented the ambiguity in interpreting these seemingly contradictory responses.}
 \protect\footnotetext[4]{We intended for these questions to ask about ALSPAC running a trial on ECAWs. However, due to the ambiguity around the terms “study”, some respondents may have interpreted this as a survey, focus group, feasibility, or pilot type of study.}

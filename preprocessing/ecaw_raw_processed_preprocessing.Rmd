@@ -27,8 +27,7 @@ raw <- readr::read_csv(here("data/raw/ecaw_raw_data.csv"))
 
 Before any exclusions we had `r nrow(raw)` responses in the dataset.
 
-# Exclusions
-## Test data
+# Excluding test data
 
 The survey was sent out on 2022/10/10 to the participants. Thus, any responses in the dataset before that data are coming from the testing of the survey. These responses will be excluded from further analysis. We excluded `r raw %>% dplyr::filter(lubridate::as_date(start_date) < lubridate::as_date("2022-10-10")) %>% nrow()` test responses. 
 
@@ -37,6 +36,8 @@ raw <-
   raw %>% 
   dplyr::filter(lubridate::as_date(start_date) >= lubridate::as_date("2022-10-10"))
 ```
+
+# Flagging not complete responses
 
 It was optional to answer all of the questions in our survey, so it is possible to have missing responses even if the respondent finished the survey. We will keep these responses.
 
@@ -70,81 +71,6 @@ raw <-
       )
 ```
 
-## Partial responses
-
-We only include data from participants who completed the survey in the final analysis, as preregistered (see the full text of the preregistration [https://osf.io/g2fw5](https://osf.io/g2fw5)). There were `r nrow(dplyr::filter(raw, !finished))` respondents who did not complete the survey.
-
-However, these responses will be included in a supplementary analysis that will be reproted in Supplementary Material D. So we save them separately before exclusion.
-
-```{r}
-processed_all <- 
-  raw %>%
-  mutate(duration_in_mins = duration_in_seconds / 60) %>%
-  select(
-    -start_date,
-    -end_date,
-    -status,
-    -progress,
-    -finished,
-    -duration_in_seconds,
-    -recorded_date,
-    -distribution_channel,
-    -user_language
-  ) %>% 
-  # remove participants who only opened the survey but did not answer any questions. All participants who had NA for the first question (typically_trustworthy), had NAs for all questions
-  filter(!is.na(typically_trustworthy))
-
-
-processed_all <- 
-  processed_all 
-
-readr::write_csv(processed_all, here("data/processed/ecaw_processed_all_data.csv"))
-```
-
-The full dataset that we are going to use to calculate the results in Supplement D includes `r nrow(processed_all)` responses.
-
-We create a simple codebook for this dataset.
-
-```{r}
-processed_all_codebook <-
-  read_csv(here("data/source/ecaw_221102_source_codebook.csv")) %>% 
-  select(-original_var_name) %>% 
-  rename(var_name = new_var_name) %>% 
-  filter(var_name %in% colnames(processed_all))
-
-# Adding new column descriptions
-new_row1 <- tibble(
-  description = "True if respondent has any missing responses.",
-  var_name = "has_missing"
-)
-new_row2 <- tibble(
-  description = "Time spent from opening the survey to closing it in minutes.",
-  var_name = "duration_in_mins"
-)
-
-codebook <- bind_rows(processed_all_codebook, new_row1, new_row2)
-
-readr::write_csv(processed_all_codebook, here("data/processed/ecaw_processed_all_codebook.csv"))
-```
-
-Excluding the respondents who did not finish the questionnaire.
-
-```{r}
-raw <- 
-  raw %>% 
-  dplyr::filter(finished) %>%
-  filter(!(response_id %in% c("R_2ZVO2mDq0eBPYDn",
-                              "R_3qr9uw1HGF53UiJ",
-                              "R_3iQHcAwCVxBXAEd",
-                              "R_1HqrkliX8SXIZqS")
-  )
-  )
-# We did a brief visual inspection of the data and feel these first three respondents fit better as partially completed surveys. Although they clicked through to the end of the survey, they did no answer questions after a certain point. For example, one respondent only answered the first two quetsions and clicked through to the end of the survey in 49 seconds.
-# The fourth response appears to be non-sincere. All their responses were neutral, several were skipped, and it was completed in 146 seconds. This respondent may have simply wanted to see the survey. 
-```
-
-At the end of the exclusion we had `r nrow(raw)` responses remaining for the analysis. There were `r filter(raw, has_missing) %>% nrow()` respondents who had at least one missing value for a closed-ended question.
-
 # Distribution of completition time
 
 The median time to complete the survey was `r median(raw$duration_in_seconds) / 60`.
@@ -163,47 +89,6 @@ raw %>%
     x = "Response duration in minutes",
     y = "Count"
   )
-```
-
-# Delete not used variables
-
-```{r}
-raw <-
-  raw %>% 
-  select(
-    - start_date,
-    - end_date,
-    - status,
-    - progress,
-    - finished,
-    - duration_in_seconds,
-    - recorded_date,
-    - distribution_channel,
-    - user_language
-  )
-```
-
-# Exploring the number of responses to open-ended questions
-
-The survey contained 4 open-ended questions (*unsure_explain*, *drawback_ecaw*, *suggestions*, *comments*) that we analyzed qualitatively, as preregistered.
-
-Here, we calculate the number of responses for each open ended question.
-
-```{r}
-raw %>% 
-  select(unsure_explain, drawback_ecaw, suggestions, comments) %>% 
-  # convert to long format
-  pivot_longer(
-    cols = everything(),
-    names_to = "variable",
-    values_to = "response",
-  ) %>% 
-  # flag missing responses
-  mutate(is_na = is.na(response)) %>%
-  # count missing responses per variables
-  count(variable, is_na) %>% 
-  # keep only complete responses
-  filter(!is_na)
 ```
 
 # Categorizing free-text responses
@@ -240,6 +125,124 @@ raw <-
     - group_mk)
 ```
 
+# Partial responses
+
+We only include data from participants who completed the survey in the final analysis, as preregistered (see the full text of the preregistration [https://osf.io/g2fw5](https://osf.io/g2fw5)). There were `r nrow(dplyr::filter(raw, !finished))` respondents who did not complete the survey.
+
+However, these responses will be included in a supplementary analysis that will be reproted in Supplementary Material D. So we save them separately before exclusion.
+
+```{r}
+processed_all <- 
+  raw %>%
+  # Delete not used variables
+  select(
+    - start_date,
+    - end_date,
+    - status,
+    - progress,
+    - finished,
+    - duration_in_seconds,
+    - recorded_date,
+    - distribution_channel,
+    - user_language
+  ) %>% 
+  # Remove participants who only opened the survey but did not answer any questions. All participants who had NA for the first question (typically_trustworthy), had NAs for all questions
+  # These respondents are included from the main analysis as well see section Excluding partial responses
+  filter(!is.na(typically_trustworthy))
+
+readr::write_csv(processed_all, here("data/processed/ecaw_processed_all_data.csv"))
+```
+
+The full dataset that we are going to use to calculate the results in Supplement D includes `r nrow(processed_all)` responses.
+
+We create a simple codebook for this dataset.
+
+```{r}
+# We re using the codebook for the source dataset as a template and append it with the new variables and their description
+processed_all_codebook <-
+  read_csv(here("data/source/ecaw_221102_source_codebook.csv")) %>% 
+  select(-original_var_name) %>% 
+  rename(var_name = new_var_name) %>% 
+  filter(var_name %in% colnames(processed_all))
+
+# Adding new column descriptions
+new_rows <- tibble(
+  description = c(
+    "True if respondent has any missing responses.",
+    "Time spent from opening the survey to closing it in minutes."
+    ),
+  var_name = c(
+    "has_missing",
+    "duration_in_mins"
+    )
+)
+
+codebook <- bind_rows(processed_all_codebook, new_rows)
+
+readr::write_csv(processed_all_codebook, here("data/processed/ecaw_processed_all_codebook.csv"))
+```
+
+# Excluding partial responses
+
+Excluding the respondents who did not finish the questionnaire for the main analysis.
+
+```{r}
+raw <- 
+  raw %>% 
+  dplyr::filter(finished) %>%
+  dplyr::filter(!(response_id %in% c("R_2ZVO2mDq0eBPYDn",
+                                     "R_3qr9uw1HGF53UiJ",
+                                     "R_3iQHcAwCVxBXAEd",
+                                     "R_1HqrkliX8SXIZqS")
+                  )
+  )
+# We did a brief visual inspection of the data and feel these first three respondents fit better as partially completed surveys. Although they clicked through to the end of the survey, they did no answer questions after a certain point. For example, one respondent only answered the first two quetsions and clicked through to the end of the survey in 49 seconds.
+# The fourth response appears to be non-sincere. All their responses were neutral, several were skipped, and it was completed in 146 seconds. This respondent may have simply wanted to see the survey. 
+```
+
+# Delete not used variables
+
+```{r}
+raw <-
+  raw %>% 
+  select(
+    - start_date,
+    - end_date,
+    - status,
+    - progress,
+    - finished,
+    - duration_in_seconds,
+    - recorded_date,
+    - distribution_channel,
+    - user_language
+  )
+```
+
+At the end of the exclusion we had `r nrow(raw)` responses remaining for the analysis. There were `r filter(raw, has_missing) %>% nrow()` respondents who had at least one missing value for a closed-ended question.
+
+# Exploring the number of responses to open-ended questions
+
+The survey contained 4 open-ended questions (*unsure_explain*, *drawback_ecaw*, *suggestions*, *comments*) that we analyzed qualitatively, as preregistered.
+
+Here, we calculate the number of responses for each open ended question.
+
+```{r}
+raw %>% 
+  select(unsure_explain, drawback_ecaw, suggestions, comments) %>% 
+  # convert to long format
+  pivot_longer(
+    cols = everything(),
+    names_to = "variable",
+    values_to = "response",
+  ) %>% 
+  # flag missing responses
+  mutate(is_na = is.na(response)) %>%
+  # count missing responses per variables
+  count(variable, is_na) %>% 
+  # keep only complete responses
+  filter(!is_na)
+```
+
 # Creating a simple codebook
 
 For creating the codebook for the processed data we will use the codebook created for the source data.
@@ -252,16 +255,18 @@ codebook <-
   filter(var_name %in% colnames(raw))
 
 # Adding new column descriptions
-new_row1 <- tibble(
-  description = "True if respondent has any missing responses.",
-  var_name = "has_missing"
-)
-new_row2 <- tibble(
-  description = "Time spent from opening the survey to closing it in minutes.",
-  var_name = "duration_in_mins"
+new_rows <- tibble(
+  description = c(
+    "True if respondent has any missing responses.",
+    "Time spent from opening the survey to closing it in minutes."
+    ),
+  var_name = c(
+    "has_missing",
+    "duration_in_mins"
+    )
 )
 
-codebook <- bind_rows(codebook, new_row1, new_row2)
+codebook <- bind_rows(codebook, new_rows)
 
 # Save the codebook
 readr::write_csv(codebook, here("data/processed/ecaw_processed_codebook.csv"))
