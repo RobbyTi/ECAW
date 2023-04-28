@@ -43,7 +43,7 @@ keywords          : "Blind data analysis; preregistration; ALSPAC; meta-research
 wordcount         : "4020"
 bibliography      : "ecaw-ref.bib"
 floatsintext      : yes
-linenumbers       : yes
+linenumbers       : no
 draft             : no
 mask              : no
 figurelist        : no
@@ -474,7 +474,7 @@ method_plot_data <-
   group_by(type) %>%
   count(scale) %>%
   ungroup() %>%
-  replace_na(list(scale = "Missing")) %>%
+  replace_na(list(scale = "Missing")) %>% 
   mutate(
     scale = factor(scale, levels = c(
       "Never or almost never",
@@ -482,7 +482,7 @@ method_plot_data <-
       "About half the time",
       "Most of the time",
       "Always or almost always",
-      "Missing",
+      # "Missing", Since there are no missing values
       "I don't understand the question"
     )),
     type = case_when(
@@ -804,17 +804,17 @@ knitr::include_graphics("figs/open-ended-table_figure.png", dpi = 300)
 \pagebreak
 
 ## Exploratory analyses
-Results can be explored interactively by following the instructions for running the code at [INSERT DATA LINK]. Based on the sample size of 107 participants and a lack of visually striking differences when exploring subsets of respondents, we do not report further on exploratory analyses.
+Results can be explored interactively by following the instructions for running the code at https://github.com/RobbyTi/ECAW. Based on the sample size of `r nrow(processed)` participants and a lack of visually striking differences when exploring subsets of respondents, we do not report further on exploratory analyses.
 
 # Discussion
-The survey results suggest that a trial of ECAWs with ALSPAC could be feasible for at least three reasons. First, ECAWs are possible because most respondents reported performing confirmatory analyses with analysis scripts written using programming languages. Second, ECAWs are relevant because many respondents reported limited use of other methods to improve rigour and reproducibility—including preregistration, sharing analysis scripts, and blinding analysts. Moreover, although participants generally agreed that findings from observational research using pre-existing data are trustworthy and reproducible, they also believed that ECAWs would make research findings more trustworthy and more reproducible. Third, ECAWs appear relatively acceptable. For example, only 10% of respondents disagreed that ALSPAC should run a study on ECAWs, and 25% agreed that they would be less likely to use the ALSPAC dataset if they were required to use an ECAW.
+The survey results suggest that a trial of ECAWs with ALSPAC could be feasible for at least three reasons. First, ECAWs are possible because most respondents reported performing confirmatory analyses with analysis scripts written using programming languages. Second, ECAWs are relevant because many respondents reported limited use of other methods to improve rigour and reproducibility—including preregistration, sharing analysis scripts, and blinding analysts. Moreover, although participants generally agreed that findings from observational research using pre-existing data are trustworthy and reproducible, they also believed that ECAWs would make research findings more trustworthy and more reproducible. Third, ECAWs appear relatively acceptable. For example, only `r pull(filter(study, support == "negative"), percentage)`% of respondents disagreed that ALSPAC should run a study on ECAWs, and `r pull(filter(willing, support == "negative"), percentage)`% agreed that they would be less likely to use the ALSPAC dataset if they were required to use an ECAW.
 
 The open-ended responses revealed interest in policies and interventions with similar goals to ECAWs. These include requirements for the sharing of final analysis scripts, a database of all ongoing studies that use a particular dataset, and openly available synthetic datasets. 
 
 ## Limitations
 Given the response rate of 10%, our results represent the opinions of a select set of researchers who may be more interested and involved in reproducible research practices. Indeed, respondents themselves believed that they were more concerned about reproducibility than other researchers in their field (Supplementary Figure C2). ECAWs may be less acceptable among non-responders and non-response may be a mark of lack of interest in the concept. Nonetheless, the absolute number of responders suggests that there is an audience of researchers who might be interested to pursue this approach.
 
-The survey results are best understood as the initial thoughts of participants when introduced to the concept of ECAWs. The median response time was 7.2 minutes (IQR: 4.3 to 13.1) for a survey that included over 20 questions and a 500-word description of ECAWs. Thus, it is unlikely that respondents spent much time reflecting on ECAWs and their implications.
+The survey results are best understood as the initial thoughts of participants when introduced to the concept of ECAWs. The median response time was `r format(round(median(processed$duration_in_mins), 1), nsmall = 1)` minutes (IQR: `r format(round(quantile(processed$duration_in_mins, .25, na.rm = TRUE), 1), nsmall = 1)` to `r format(round(quantile(processed$duration_in_mins, .75, na.rm = T), 1), nsmall = 1)`) for a survey that included over 20 questions and a 500-word description of ECAWs. Thus, it is unlikely that respondents spent much time reflecting on ECAWs and their implications.
 
 We invited researchers from the ALSPAC mailing list which includes researchers across the fields of health and social sciences, but we did not record the specific disciplines in which the respondents were active. Thus, while ECAWs may be more relevant to some disciplines, the present survey does delve into the idiosyncrasies among disciplines. 
 
