@@ -91,6 +91,14 @@
 % get rid of language-specific shorthands (see #6817):
 \let\LanguageShortHands\languageshorthands
 \def\languageshorthands#1{}
+\usepackage{tcolorbox}
+\usepackage{caption}
+\usepackage{setspace}
+\usepackage{relsize}
+\usepackage[document,bottom]{ragged2e}
+\captionsetup[figure]{labelformat=empty}
+\captionsetup[table]{labelformat=empty}
+\raggedbottom
 % Manuscript styling
 \usepackage{upgreek}
 \captionsetup{font=singlespacing,justification=justified}
@@ -160,9 +168,6 @@
 
 \linenumbers
 \usepackage{csquotes}
-\usepackage{tcolorbox}
-\usepackage{caption}
-\captionsetup[figure]{labelformat=empty}
 \ifLuaTeX
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
@@ -186,20 +191,22 @@
 
 \authornote{
 
-Correspondence concerning this article should be addressed to Robert T. Thibault, Enter postal address here. E-mail: \href{mailto:robert.thibault@stanford.edu}{\nolinkurl{robert.thibault@stanford.edu}}
+Correspondence concerning this article should be addressed to Robert T. Thibault. E-mail: \href{mailto:robert.thibault@stanford.edu}{\nolinkurl{robert.thibault@stanford.edu}}
 
 }
 
 \affiliation{\vspace{0.5cm}\textsuperscript{1} Meta-Research Innovation Center at Stanford (METRICS), Stanford University.\\\textsuperscript{2} School of Psychological Science, University of Bristol.\\\textsuperscript{3} Doctoral School of Psychology, ELTE Eotvos Lorand University, Budapest, Hungary\\\textsuperscript{4} Institute of Psychology, ELTE Eotvos Lorand University, Budapest, Hungary\\\textsuperscript{5} Melbourne School of Psychological Sciences, University of Melbourne.\\\textsuperscript{6} Department of Psychology, University of Amsterdam.\\\textsuperscript{7} Meta-Research Innovation Center Berlin (METRIC-B), QUEST Center for Transforming Biomedical Research, Berlin Institute of Health, Charité -- Universitätsmedizin Berlin.\\\textsuperscript{8} MRC Integrative Epidemiology Unit at the University of Bristol.}
 
 \abstract{%
-\textbf{Background.} Although preregistration can reduce researcher bias and increase transparency in primary research settings, it is less applicable to secondary data analysis. An alternative method that affords additional protection from researcher bias, which cannot be gained from conventional forms of preregistration alone, is an Explore and Confirm Analysis Workflow (ECAW). In this workflow, a data management organization initially provides access to only a subset of their dataset to researchers who request it. The researchers then prepare an analysis script based on the subset of data, upload the analysis script to a registry, and then receive access to the full dataset. ECAWs aim to achieve similar goals as preregistration, but make access to the full dataset contingent on compliance. The present survey aimed to garner information from the research community where ECAWs could be applied---employing the Avon Longitudinal Study of Parents and Children (ALSPAC) as a case example. \hfill \break \hfill \break \textbf{Methods.} We emailed a web-based survey to researchers who had previously applied for access to ALSPAC's transgenerational observational dataset.\hfill \break \hfill \break \textbf{Results}. We received 107 responses, for a 10\% response rate. The results suggest that---at least among our sample of respondents---ECAWs hold the potential to serve their intended purpose and appear relatively acceptable. For example, only 10\% of respondents disagreed that ALSPAC should run a study on ECAWs (versus 55\% who agreed). However, as many as 25\% of respondents agreed that they would be less willing to use ALSPAC data if they were required to use an ECAW (versus 44\% who disagreed).\hfill \break \hfill \break \textbf{Conclusion.} Our data and findings provide information for organizations and individuals interested in implementing ECAWs and related interventions. \hfill \break \hfill \break \textbf{Preregistration:} \url{https://osf.io/g2fw5} Deviations from the preregistration are outlined in Supplementary Material A.
+\justifying\textbf{Background.} Although preregistration can reduce researcher bias and increase transparency in primary research settings, it is less applicable to secondary data analysis. An alternative method that affords additional protection from researcher bias, which cannot be gained from conventional forms of preregistration alone, is an Explore and Confirm Analysis Workflow (ECAW). In this workflow, a data management organization initially provides access to only a subset of their dataset to researchers who request it. The researchers then prepare an analysis script based on the subset of data, upload the analysis script to a registry, and then receive access to the full dataset. ECAWs aim to achieve similar goals as preregistration, but make access to the full dataset contingent on compliance. The present survey aimed to garner information from the research community where ECAWs could be applied---employing the Avon Longitudinal Study of Parents and Children (ALSPAC) as a case example. \hfill \break \hfill \break \textbf{Methods.} We emailed a web-based survey to researchers who had previously applied for access to ALSPAC's transgenerational observational dataset.\hfill \break \hfill \break \textbf{Results}. We received 107 responses, for a 10\% response rate. The results suggest that---at least among our sample of respondents---ECAWs hold the potential to serve their intended purpose and appear relatively acceptable. For example, only 10\% of respondents disagreed that ALSPAC should run a study on ECAWs (versus 55\% who agreed). However, as many as 25\% of respondents agreed that they would be less willing to use ALSPAC data if they were required to use an ECAW (versus 44\% who disagreed).\hfill \break \hfill \break \textbf{Conclusion.} Our data and findings provide information for organizations and individuals interested in implementing ECAWs and related interventions. \hfill \break \hfill \break \textbf{Preregistration:} \url{https://osf.io/g2fw5} Deviations from the preregistration are outlined in Supplementary Material A.
 }
 
 
 
 \begin{document}
 \maketitle
+
+\justifying
 
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
@@ -222,13 +229,11 @@ We call this process an Explore and Confirm Analysis Workflow (ECAW). Researcher
 
 In short, ECAWs give researchers access to enough data to develop an informed analysis, but without compromising the confirmatory nature of a final analysis on the complete dataset.
 
-\pagebreak
-
 \begin{tcolorbox}
-\textbf{Box 1. A hypothetical example of an ECAW in practice.}
+{\fontsize{9pt}{9pt}\selectfont\textbf{Box 1. A hypothetical example of an ECAW in practice.}}
 
 \includegraphics[width=1\textwidth]{./ecaw_workflow.png}
-{\fontsize{10pt}{10pt}\selectfont
+{\fontsize{9pt}{9pt}\selectfont
 The overarching framework for ECAWs is depicted above. Within this framework, data management organizations would need to pre-specify several details for each step. Below, we provide a hypothetical example for illustrative purposes. The exact implementation of ECAWs would depend on the preferences of each data management organization and the community who uses their dataset.
 
 \begin{enumerate}
@@ -283,7 +288,7 @@ We present the results for closed-ended questions as prevalence rates or counts 
 \hypertarget{survey-completion}{%
 \subsection{Survey completion}\label{survey-completion}}
 
-Of 1148 emails sent, 1094 went through and 54 bounced. The survey was completed 103 times and partially completed 20 times, leading to a response rate of 9\% for complete surveys and 11\% for at least partially complete surveys.\footnote[1]{The ALSPAC mailing list has been maintained as a record of collaborators for many years and is constantly added to. The ALSPAC team only removes email addresses from their mailing list if someone explicitly requests this action. Thus, their list likely includes several email addresses that are no longer monitored. For example, we received one email reply stating that the recipient hasn’t been active in research for 30 years. It is also possible that some researchers have multiple email addresses on the mailing list (e.g., because they moved institutions). These two factors may have deflated the response rate.} The median time to complete the survey was 7.40 minutes (IQR: 4.60 to 13.10). This manuscript presents the results for complete surveys. Supplementary Material D presents the results with partially complete surveys included.
+Of 1148 emails sent, 1094 went through and 54 bounced. The survey was completed 103 times and partially completed 20 times, leading to a response rate of 9\% for complete surveys and 11\% for at least partially complete surveys.\footnote[1]{The ALSPAC mailing list has been maintained as a record of collaborators for many years and is constantly added to. The ALSPAC team only removes email addresses from their mailing list if someone explicitly requests this action. Thus, their list likely includes several email addresses that are no longer monitored. For example, we received one email reply stating that the recipient hasn’t been active in research for 30 years. It is also possible that some researchers have multiple email addresses on the mailing list (e.g., because they moved institutions). These two factors may have deflated the response rate.} The median time to complete the survey was 7.4 minutes (IQR: 4.6 to 13.1). This manuscript presents the results for complete surveys. Supplementary Material D presents the results with partially complete surveys included.
 
 \hypertarget{participants-1}{%
 \subsection{Participants}\label{participants-1}}
@@ -293,9 +298,9 @@ Respondents had published a median of 10 (IQR 2 to 26) studies using preexisting
 \hypertarget{survey-results}{%
 \subsection{Survey results}\label{survey-results}}
 
-Most respondents agreed that studies that analyze preexisting observational datasets are trustworthy (72\%; 74/103) and reproducible (79\%; 81/103) (Figure 2, top panel). At the same time, many agreed that a study using an ECAW would be \emph{more} trustworthy (70\%; 70/100) and \emph{more} reproducible (68\%; 69/101) compared to a typical study using preexisting observational data (Figure 1, bottom panel).
+Most respondents agreed that studies that analyze preexisting observational datasets are trustworthy (72\%; 74/103) and reproducible (79\%; 81/103) (Figure 1, top panel). At the same time, many agreed that a study using an ECAW would be \emph{more} trustworthy (70\%; 70/100) and \emph{more} reproducible (68\%; 69/101) compared to a typical study using preexisting observational data (Figure 1, bottom panel).
 
-\begin{figure}
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{figs/typicallyEcawPlot-1} 
 
@@ -304,11 +309,15 @@ Most respondents agreed that studies that analyze preexisting observational data
 \caption{\textbf{Figure 1. Responses to the survey questions on trustworthiness and reproducibility of observational research with preexisting data and ECAWs.} The survey defined trustworthy as ``meaning that the results and conclusions of the publications are valid, reliable, rigorous, and accurate. That they merit trust''. The survey defined reproducible ``in the sense that other researchers re-analysing the data with the same research question would produce similar results.'' For each item, the number to the left of the data bar indicates the combined percentage for the responses depicted in any shade of brown/orange. The number in the center of the data bar (gray) indicates the percentage of neutral responses. The number to the right of the data bar indicates the combined percentage for the responses depicted in any shade of green. The bar charts in the top panel had no missing responses or selection of the option \emph{``I don't understand the question''}. The bar charts in the bottom panel excluded responses of \emph{``I don't understand the question''} (n = 3; 2).}\label{fig:typicallyEcawPlot}
 \end{figure}
 
+{\smaller[1] \singlespacing
 
+
+
+}
 
 Over half of respondents reported that their studies using preexisting observational data are preregistered never or almost never (36\%; 37/103), or sometimes (25\%; 26/103) (Figure 2). About half reported sharing their analysis scripts never or almost never (20\%; 21/103), or sometimes (32\%; 33/103). 77\% (79/103) reported that they never or almost never blind the data analyst. Almost all respondents answered that they use both exploratory (93\%; 96/103) and confirmatory (87\%; 90/103) analyses at least sometimes.
 
-\begin{figure}
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{figs/methodPlot-1} 
 
@@ -317,11 +326,15 @@ Over half of respondents reported that their studies using preexisting observati
 \caption{\textbf{Figure 2. Responses to survey questions about the research practices of participants.}}\label{fig:methodPlot}
 \end{figure}
 
+{\smaller[1] \singlespacing
 
+
+
+}
 
 26\% (26/101) of respondents agreed (versus 45\%; 45/101 who disagreed) that they would be less willing to use ALSPAC data if they were required to use an ECAW (Figure 3). 53\% (50/94) agreed (20\%; 19/94 disagreed) that they would opt-in if ALSPAC ran a study on ECAWs. 55\% (53/96) agreed (10\%; 10/96 disagreed) that ALSPAC should run a study on ECAWs. 46\% (43/94) agreed (22\%; 21/94 disagreed) that they would prefer using an ECAW than using typical preregistration.
 
-\begin{figure}
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{figs/alspacPlot-1} 
 
@@ -330,26 +343,40 @@ Over half of respondents reported that their studies using preexisting observati
 \caption{\textbf{Figure 3. Responses to survey questions about using ECAWs.} These bar charts exclude responses of \emph{``I don't understand the question''} (\emph{n} = 0; 4; 1; 1; respectively from top to bottom), and responses of \emph{``Unsure''} (\emph{n} = 2; 5; 6; 8). Agreement with the first question may be slightly inflated due to the format of the questions in this block. Respondents with a highly positive inclination towards ECAWs would be expected to disagree with the first question, but agree with the next three questions. Four respondents agreed with all four statements, suggesting they may have glazed over the word ``less'' in the first question \protect\footnotemark[3]. Interpreting responses to the second and third question come with a degree of ambiguity as the survey did not specify what was meant by the term ``study'' \protect\footnotemark[4].}\label{fig:alspacPlot}
 \end{figure}
 
+{\smaller[1] \singlespacing
 
+
+
+}
 
 \protect\footnotetext[3]{Another four respondents agreed with at least the first and second question, which appear contradictory. We did not preregister these considerations. More careful wording of these questions could have circumvented the ambiguity in interpreting these seemingly contradictory responses.}
 \protect\footnotetext[4]{We intended for these questions to ask about ALSPAC running a trial on ECAWs. However, due to the ambiguity around the terms “study”, some respondents may have interpreted this as a survey, focus group, feasibility, or pilot type of study.}
 
-\textbf{Table 1. Recurring topics in responses to the open-ended survey questions.} The survey included 4 open-ended questions with broad prompts regarding running a study on ECAWs, benefits and drawbacks of ECAWs, related research practices, and general comments. These questions received a total of (92) responses from (55) unique respondents. A complete list of responses are viewable in the open data {[}LINK{]}. We synthesized the responses to open-ended questions into the 9 topics on the left side of this table. We divide these into three sections: (i) concerns about the acceptability of ECAWs, (ii) concerns that ECAWs will not have their intended impact, and (iii) alternative interventions that may achieve similar goals as conventional preregistration and ECAWs. On the right side of the table, we provide our reflection on each topic.
+\pagebreak
+
+{\smaller[1]
+\begin{singlespace}
+
+\textbf{\emph{Table 1. Recurring topics in responses to the open-ended survey questions.}} The survey included 4 open-ended questions with broad prompts regarding running a study on ECAWs, benefits and drawbacks of ECAWs, related research practices, and general comments. These questions received a total of (92) responses from (55) unique respondents. A complete list of responses are viewable in the open data {[}LINK{]}. We synthesized the responses to open-ended questions into the 9 topics on the left side of this table. We divide these into three sections: (i) concerns about the acceptability of ECAWs, (ii) concerns that ECAWs will not have their intended impact, and (iii) alternative interventions that may achieve similar goals as conventional preregistration and ECAWs. On the right side of the table, we provide our reflection on each topic.
+
+\end{singlespace}
+}
 
 \begin{figure}
 
-{\centering \includegraphics[width=1\linewidth]{figs/open-ended-table_figure} 
+{\centering \includegraphics[width=1\linewidth,height=3\textheight]{figs/open-ended-table_figure} 
 
 }
 
 \caption{ }\label{fig:openEndedTable}
 \end{figure}
 
+\pagebreak
+
 \hypertarget{exploratory-analyses}{%
 \subsection{Exploratory analyses}\label{exploratory-analyses}}
 
-Results can be explored interactively at {[}TEMPORARY LINK{]}, or by running the code available at {[}INSERT DATA LINK{]}. Based on the sample size of 107 participants and a lack of visually striking differences when exploring subsets of respondents, we do not report further on exploratory analyses.
+Results can be explored interactively by following the instructions for running the code at {[}INSERT DATA LINK{]}. Based on the sample size of 107 participants and a lack of visually striking differences when exploring subsets of respondents, we do not report further on exploratory analyses.
 
 \hypertarget{discussion}{%
 \section{Discussion}\label{discussion}}
@@ -403,19 +430,19 @@ Robert Thibault is supported by a general support grant awarded to METRICS from 
 \hypertarget{contributions}{%
 \subsection{Contributions}\label{contributions}}
 
-\textbf{Conceptualization:} Robert T. Thibault and Marcus R. Munafò.
-\textbf{Data curation:} Marton Kovacs.
-\textbf{Formal analysis:} Robert T. Thibault and Marton Kovacs.
-\textbf{Funding acquisition:} Robert T. Thibault and John P. A. Ioannidis.
-\textbf{Investigation:} Robert T. Thibault.
-\textbf{Methodology:} Robert T. Thibault, Tom E. Hardwicke, Alexandra Sarafoglou, John P. A. Ioannidis, and Marcus R. Munafò.
-\textbf{Project administration:} Robert T. Thibault.
-\textbf{Resources:} Robert T. Thibault.
-\textbf{Software:} Marton Kovacs.
-\textbf{Supervision:} Robert T. Thibault and Marcus R. Munafò.
-\textbf{Validation:} Robert T. Thibault and Marton Kovacs.
-\textbf{Visualization:} Robert T. Thibault and Marton Kovacs.
-\textbf{Writing - original draft:} Robert T. Thibault.
+\textbf{Conceptualization:} Robert T. Thibault and Marcus R. Munafò.\hfill\break
+\textbf{Data curation:} Marton Kovacs.\hfill\break
+\textbf{Formal analysis:} Robert T. Thibault and Marton Kovacs.\hfill\break
+\textbf{Funding acquisition:} Robert T. Thibault and John P. A. Ioannidis.\hfill\break
+\textbf{Investigation:} Robert T. Thibault.\hfill\break
+\textbf{Methodology:} Robert T. Thibault, Tom E. Hardwicke, Alexandra Sarafoglou, John P. A. Ioannidis, and Marcus R. Munafò.\hfill\break
+\textbf{Project administration:} Robert T. Thibault.\hfill\break
+\textbf{Resources:} Robert T. Thibault.\hfill\break
+\textbf{Software:} Marton Kovacs.\hfill\break
+\textbf{Supervision:} Robert T. Thibault and Marcus R. Munafò.\hfill\break
+\textbf{Validation:} Robert T. Thibault and Marton Kovacs.\hfill\break
+\textbf{Visualization:} Robert T. Thibault and Marton Kovacs.\hfill\break
+\textbf{Writing - original draft:} Robert T. Thibault.\hfill\break
 \textbf{Writing - review \& editing:} Robert T. Thibault, Marton Kovacs, Tom E. Hardwicke, Alexandra Sarafoglou, John P. A. Ioannidis, and Marcus R. Munafò.
 
 \hypertarget{competing-interests}{%
@@ -470,21 +497,19 @@ Schmidt, K., Jones, A., Szabelska, A., Ebersole, C. R., Hawkins, C. B., Graham, 
 
 \newpage
 
-\hypertarget{appendix-appendix}{%
-\appendix}
-
-
 \hypertarget{supplementary-material-a.-deviations-from-the-preregistration.}{%
 \section{Supplementary Material A. Deviations from the preregistration.}\label{supplementary-material-a.-deviations-from-the-preregistration.}}
 
 \begin{enumerate}
+
   \item We rephrased our second objective to be more accurate. The preregistration reads “2.    To use these insights to inform future research on how data management organizations can encourage rigorous and reproducible research practices (survey Blocks 3-6). This objective includes assessing and refining potential interventions—such as ECAWs—and assessing their acceptability. ”. The manuscript reads “(2) To use these insights to inform future research—including a potential trial of ECAWs with the Avon Longitudinal Study of Parents and Children (ALSPAC)—on how data management organizations can encourage rigorous and reproducible research practices.”
   \item Marton Kovacs was added as a contributor during data collection. This led to a few of the projected contributor roles outlined in the preregistration to be different from the final contributor roles outlined in the manuscript.
   \item The preregistration stated that: “We will tabulate descriptive summary statistics for all the survey questions.” Instead of tabulating the results, the manuscript presents this data in figures. We feel that the figures are easier to digest as compared to tabulated data.
   \item The preregistration stated that: “we   will   present   results   that   include   responses   from participants who did not complete the entire survey, alongside the associated response rate for each question.”. The results from all participants are presented in Supplementary Material D. However, instead of reporting the associated response rate for each question, we simply state that “The survey was completed 107 times and partially completed 27 times, leading to a response rate of 10% for complete surveys and 12% for incomplete surveys.”
   \item The preregistration and survey use the term “typical preregistration”. We changed this to “conventional preregistration” in the manuscript because we believe it is the more appropriate term.
   \item We performed a brief visual inspection of the data presented in spreadsheet format. Three participants clicked through to the end of the survey—so they were coded as completing the survey—however, they only responded to a few of the first questions. One other participant appears to have provided non-sincere responses in that all their responses were neutral or skipped and they completed the survey in 146 seconds. We retained these four participants as partially completed responses (results in Supplementary Material D), but removed them from the main dataset. These decisions were not preregistered.
-  \item We did not preregister which results we would present in the abstract. We decided to report the results with the highest and lowest percentage about the acceptability of ECAWs: “For example, only 10% of respondents disagreed that ALSPAC should run a study on ECAWs, but as many as 25% of respondents agreed they would be less willing to use ALSPAC data if they were required to use an ECAW.”
+  \item We did not preregister which results we would present in the abstract. We decided to report the results with the highest and lowest percentage about the acceptability of ECAWs: “For example, only 10\% of respondents disagreed that ALSPAC should run a study on ECAWs, but as many as 25\% of respondents agreed they would be less willing to use ALSPAC data if they were required to use an ECAW.”
+
 \end{enumerate}
 
 \pagebreak
@@ -545,7 +570,7 @@ The ALSPAC Executive
 \pagebreak
 
 \hypertarget{supplementary-material-c.-participant-characteristics}{%
-\subsection{Supplementary Material C. Participant Characteristics}\label{supplementary-material-c.-participant-characteristics}}
+\section{Supplementary Material C. Participant Characteristics}\label{supplementary-material-c.-participant-characteristics}}
 
 \begin{figure}
 
@@ -587,7 +612,13 @@ plink2 & 1 & 1\\
 \end{tabular}}
 \end{table}
 
+{\smaller[1]
+\begin{singlespace}
 
+
+
+\end{singlespace}
+}
 
 \begin{figure}
 
@@ -598,22 +629,30 @@ plink2 & 1 & 1\\
 \caption{\textbf{Figure C1. Responses to survey question about number of relevant publications}}\label{fig:concernedPlot}
 \end{figure}
 
+{\smaller[1]
+\begin{singlespace}
 
+
+
+\end{singlespace}
+}
+
+\pagebreak
 
 \hypertarget{supplementary-material-d.-figures-and-tables-including-participants-who-partially-complete-the-survey}{%
-\subsection{Supplementary Material D. Figures and Tables including participants who partially complete the survey}\label{supplementary-material-d.-figures-and-tables-including-participants-who-partially-complete-the-survey}}
+\section{Supplementary Material D. Figures and Tables including participants who partially complete the survey}\label{supplementary-material-d.-figures-and-tables-including-participants-who-partially-complete-the-survey}}
 
 \hypertarget{participants-2}{%
-\subsubsection{Participants}\label{participants-2}}
+\subsection{Participants}\label{participants-2}}
 
-Respondents had published a median of 10 (IQR 2 to 25) studies using preexisting observational data (Supplementary Figure C1). They reported using the following programming languages or software packages: R (n = 65), Stata (n = 48), SPSS (n = 17), SAS (n = 15), Python (n = 6), Mplus (n = 3), Bash (n = 2), MATLAB (n = 1), Nextflow (n = 1), and plink2 (n = 1) (Supplementary Table C1)\footnote[1]{Participants could select multiple responses to this survey question.}. 61\% (62/101) of participants reported being more concerned with research trustworthiness, bias, rigour, and reproducibility compared to what they think of as a typical research who uses preexisting observational data; 6\% (6/101) reported being less concerned (Supplementary Figure C2).
+Respondents had published a median of 10 (IQR 2 to 25) studies using preexisting observational data. They reported using the following programming languages or software packages: R (n = 65), Stata (n = 48), SPSS (n = 17), SAS (n = 15), Python (n = 6), Mplus (n = 3), Bash (n = 2), MATLAB (n = 1), Nextflow (n = 1), and plink2 (n = 1) \footnote[1]{Participants could select multiple responses to this survey question.}. 61\% (62/101) of participants reported being more concerned with research trustworthiness, bias, rigour, and reproducibility compared to what they think of as a typical research who uses preexisting observational data; 6\% (6/101) reported being less concerned.
 
 \hypertarget{survey-results-1}{%
 \subsection{Survey results}\label{survey-results-1}}
 
 Most respondents agreed that studies that analyze preexisting observational datasets are trustworthy (71\%; 87/123) and reproducible (77\%; 93/121) (Figure D2, top panel). At the same time, many agreed that a study using an ECAW would be \emph{more} trustworthy (70\%; 70/107) and \emph{more} reproducible (69\%; 74/108) compared to a typical study using preexisting observational data (Figure 1, bottom panel).
 
-\begin{figure}
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{figs/typicallyEcawPlotAll-1} 
 
@@ -622,11 +661,17 @@ Most respondents agreed that studies that analyze preexisting observational data
 \caption{\textbf{Figure 1D. Responses to the survey questions on trustworthiness and reproducibility of observational research with preexisting data and ECAWs.} The survey defined trustworthy as ``meaning that the results and conclusions of the publications are valid, reliable, rigorous, and accurate. That they merit trust''. The survey defined reproducible ``in the sense that other researchers re-analysing the data with the same research question would produce similar results.'' For each item, the number to the left of the data bar indicates the combined percentage for the responses depicted in any shade of brown/orange. The number in the center of the data bar (gray) indicates the percentage of neutral responses. The number to the right of the data bar indicates the combined percentage for the responses depicted in any shade of green. The bar charts in the top panel had no missing responses or selection of the option \emph{``I don't understand the question''}. The bar charts in the bottom panel excluded missing responses (n = 12; 12) and responses of \emph{``I don't understand the question''} (n = 4; 3).}\label{fig:typicallyEcawPlotAll}
 \end{figure}
 
+{\smaller[1]
+\begin{singlespace}
 
+
+
+\end{singlespace}
+}
 
 Over half of respondents reported that their studies using preexisting observational data are preregistered never or almost never (33\%; 41/123), or sometimes (21\%; 26/103) (Figure 2D). About half reported sharing their analysis scripts never or almost never (19\%; 23/123), or sometimes (29\%; 36/123). 69\% (85/123) reported that they never or almost never blind the data analyst. Almost all respondents answered that they use both exploratory (87\%; 107/123) and confirmatory (82\%; 101/123) analyses at least sometimes.
 
-\begin{figure}
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{figs/methodPlotAll-1} 
 
@@ -635,11 +680,17 @@ Over half of respondents reported that their studies using preexisting observati
 \caption{\textbf{Figure 2D. Responses to survey questions about the research practices of participants.}}\label{fig:methodPlotAll}
 \end{figure}
 
+{\smaller[1]
+\begin{singlespace}
 
+
+
+\end{singlespace}
+}
 
 25\% (26/106) of respondents agreed (versus 44\%; 47/106 who disagreed) that they would be less willing to use ALSPAC data if they were required to use an ECAW (Figure 3D). 51\% (50/98) agreed (21\%; 21/98 disagreed) that they would opt-in if ALSPAC ran a study on ECAWs. 54\% (54/100) agreed (11\%; 11/100 disagreed) that ALSPAC should run a study on ECAWs. 45\% (45/100) agreed (22\%; 22/100 disagreed) that they would prefer using an ECAW than using typical preregistration.
 
-\begin{figure}
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{figs/alspacPlotAll-1} 
 
@@ -648,7 +699,13 @@ Over half of respondents reported that their studies using preexisting observati
 \caption{\textbf{Figure 3D. Responses to survey questions about using ECAWs.} These bar charts exclude missing values (\emph{n} = 14; 14; 14; 14; respectively from top to bottom), responses of \emph{``I don't understand the question''} (\emph{n} = 0; 5; 2; 1), and responses of \emph{``Unsure''} (\emph{n} = 3; 6; 7; 8). Agreement with the first question may be slightly inflated due to the format of the questions in this block. Respondents with a highly positive inclination towards ECAWs would be expected to disagree with the first question, but agree with the next three questions. Four respondents agreed with all four statements, suggesting they may have glazed over the word ``less'' in the first question \protect\footnotemark[2]. Interpreting responses to the second and third question come with a degree of ambiguity as the survey did not specify what was meant by the term ``study'' \protect\footnotemark[3].}\label{fig:alspacPlotAll}
 \end{figure}
 
+{\smaller[1]
+\begin{singlespace}
 
+
+
+\end{singlespace}
+}
 
 \protect\footnotetext[2]{Another four respondents agreed with at least the first and second question, which appear contradictory. We did not preregister these considerations. More careful wording of these questions could have circumvented the ambiguity in interpreting these seemingly contradictory responses.}
 \protect\footnotetext[3]{We intended for these questions to ask about ALSPAC running a trial on ECAWs. However, due to the ambiguity around the terms “study”, some respondents may have interpreted this as a survey, focus group, feasibility, or pilot type of study.}

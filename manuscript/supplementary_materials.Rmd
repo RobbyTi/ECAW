@@ -2,33 +2,34 @@
 # Supplementary Material A. Deviations from the preregistration.
 
 \begin{enumerate}
+
   \item We rephrased our second objective to be more accurate. The preregistration reads “2.	To use these insights to inform future research on how data management organizations can encourage rigorous and reproducible research practices (survey Blocks 3-6). This objective includes assessing and refining potential interventions—such as ECAWs—and assessing their acceptability. ”. The manuscript reads “(2) To use these insights to inform future research—including a potential trial of ECAWs with the Avon Longitudinal Study of Parents and Children (ALSPAC)—on how data management organizations can encourage rigorous and reproducible research practices.”
   \item Marton Kovacs was added as a contributor during data collection. This led to a few of the projected contributor roles outlined in the preregistration to be different from the final contributor roles outlined in the manuscript.
   \item The preregistration stated that: “We will tabulate descriptive summary statistics for all the survey questions.” Instead of tabulating the results, the manuscript presents this data in figures. We feel that the figures are easier to digest as compared to tabulated data.
   \item The preregistration stated that: “we   will   present   results   that   include   responses   from participants who did not complete the entire survey, alongside the associated response rate for each question.”. The results from all participants are presented in Supplementary Material D. However, instead of reporting the associated response rate for each question, we simply state that “The survey was completed 107 times and partially completed 27 times, leading to a response rate of 10% for complete surveys and 12% for incomplete surveys.”
   \item The preregistration and survey use the term “typical preregistration”. We changed this to “conventional preregistration” in the manuscript because we believe it is the more appropriate term.
   \item We performed a brief visual inspection of the data presented in spreadsheet format. Three participants clicked through to the end of the survey—so they were coded as completing the survey—however, they only responded to a few of the first questions. One other participant appears to have provided non-sincere responses in that all their responses were neutral or skipped and they completed the survey in 146 seconds. We retained these four participants as partially completed responses (results in Supplementary Material D), but removed them from the main dataset. These decisions were not preregistered.
-  \item We did not preregister which results we would present in the abstract. We decided to report the results with the highest and lowest percentage about the acceptability of ECAWs: “For example, only 10% of respondents disagreed that ALSPAC should run a study on ECAWs, but as many as 25% of respondents agreed they would be less willing to use ALSPAC data if they were required to use an ECAW.”
+  \item We did not preregister which results we would present in the abstract. We decided to report the results with the highest and lowest percentage about the acceptability of ECAWs: “For example, only 10\% of respondents disagreed that ALSPAC should run a study on ECAWs, but as many as 25\% of respondents agreed they would be less willing to use ALSPAC data if they were required to use an ECAW.”
+
 \end{enumerate}
 
 \pagebreak
 
 # Supplementary Material B. Invitation email
-
 ## Original email
 
 Dear ALSPAC Data User,
- 
+
 We are working with Dr Robert Thibault, a postdoctoral scholar at Stanford University and the University of Bristol, to support his work on scientific rigour and reproducibility in observational studies. 
- 
+
 To assist him in his research we would be very grateful if you would consider completing a short survey. The purpose of this is to understand researcher’s practices and thoughts regarding the rigour and reproducibility of observational research that uses pre-existing datasets (such as the ALSPAC resource). Results from this survey may be used in the future to inform initiatives for ALSPAC to better serve our users and to maximise the quality of the research using ALSPAC.
- 
+
 The survey has 21 questions across six sections. It will be open until November 1 at this link: https://bristolexppsych.eu.qualtrics.com/jfe/form/SV_3mVgk4lzXx4kp02. It will take approximately 10-20 minutes to complete. The data you provide is completely anonymous and further information is available on the consent form at the start of the survey.
- 
+
 If you have any questions or comments, please send them directly to Robert (robert.thibault@bristol.ac.uk).
 
 Kind regards,
- 
+
 The ALSPAC Executive
 
 ---
@@ -56,7 +57,7 @@ Thank you very much to those of you who have already completed the survey below.
 This will be our final email inviting you to complete the survey (see details in the original email below), which closes of November 1st.
  
 The median time to complete the survey has been 8 minutes.
- 
+
 Please send any comments or queries directly to Robert (robert.thibault@bristol.ac.uk).
 
 Many thanks,
@@ -64,7 +65,7 @@ The ALSPAC Executive
 
 \pagebreak
 
-## Supplementary Material C. Participant Characteristics
+# Supplementary Material C. Participant Characteristics
 
 ```{r numStudiesPlot, fig.align="center", out.width="100%", fig.width=6, fig.height=3.2, fig.path='figs/', dev=c('png', 'pdf')}
 # Create text for missing responses
@@ -144,7 +145,15 @@ processed %>%
   collapse_rows(columns = 1, valign = "top", latex_hline = "major", row_group_label_position = "identity")
 ```
 
+```{=latex}
+{\smaller[1]
+\begin{singlespace}
+```
 (ref:table1c-caption) __Table C1. “What programming language or software do you use for your analyses of preexisting observational data? (you may select multiple answers)”__
+```{=latex}
+\end{singlespace}
+}
+```
 
 ```{r concernedPlot, warning=FALSE, fig.cap="(ref:concernedPlotCaption)", fig.align="center", out.width="100%", fig.width=10, fig.height=4, fig.path='figs/', dev=c('png', 'pdf')}
 # Concerned figure data preparation
@@ -197,10 +206,20 @@ plot(concerned_likert_plot_data, digits = 1, text.size = 6, group.order = names(
   )
 ```
 
+```{=latex}
+{\smaller[1]
+\begin{singlespace}
+```
 (ref:concernedPlotCaption) __Figure C1. Responses to survey question about number of relevant publications__
+```{=latex}
+\end{singlespace}
+}
+```
 
-## Supplementary Material D. Figures and Tables including participants who partially complete the survey
-### Participants
+\pagebreak
+
+# Supplementary Material D. Figures and Tables including participants who partially complete the survey
+## Participants
 
 ```{r languageDescriptivesAll, include=FALSE}
 # List of used programming languages and their counts text
@@ -237,7 +256,7 @@ concerned_all <- support_percentage(
 )
 ```
 
-Respondents had published a median of `r median(processed_all$n_studies, na.rm = TRUE)` (IQR `r round(quantile(processed_all$n_studies, .25, na.rm = TRUE))` to `r round(quantile(processed_all$n_studies, .75, na.rm = TRUE))`) studies using preexisting observational data (Supplementary Figure C1). They reported using the following programming languages or software packages: `r language_text_all` (Supplementary Table C1)\footnote[1]{Participants could select multiple responses to this survey question.}. `r pull(filter(concerned_all, support == "positive"), percentage)`% (`r pull(filter(concerned_all, support == "positive"), n)`/`r pull(filter(concerned_all, support == "positive"), n_sum)`) of participants reported being more concerned with research trustworthiness, bias, rigour, and reproducibility compared to what they think of as a typical research who uses preexisting observational data; `r pull(filter(concerned_all, support == "negative"), percentage)`% (`r pull(filter(concerned_all, support == "negative"), n)`/`r pull(filter(concerned_all, support == "negative"), n_sum)`) reported being less concerned (Supplementary Figure C2).
+Respondents had published a median of `r median(processed_all$n_studies, na.rm = TRUE)` (IQR `r round(quantile(processed_all$n_studies, .25, na.rm = TRUE))` to `r round(quantile(processed_all$n_studies, .75, na.rm = TRUE))`) studies using preexisting observational data. They reported using the following programming languages or software packages: `r language_text_all` \footnote[1]{Participants could select multiple responses to this survey question.}. `r pull(filter(concerned_all, support == "positive"), percentage)`% (`r pull(filter(concerned_all, support == "positive"), n)`/`r pull(filter(concerned_all, support == "positive"), n_sum)`) of participants reported being more concerned with research trustworthiness, bias, rigour, and reproducibility compared to what they think of as a typical research who uses preexisting observational data; `r pull(filter(concerned_all, support == "negative"), percentage)`% (`r pull(filter(concerned_all, support == "negative"), n)`/`r pull(filter(concerned_all, support == "negative"), n_sum)`) reported being less concerned.
 
 ## Survey results
 
@@ -299,7 +318,7 @@ ecaw_reproducible_all <- support_percentage(
 
 Most respondents agreed that studies that analyze preexisting observational datasets are trustworthy (`r pull(filter(typically_trustworthy_all, support == "positive"), percentage)`%; `r pull(filter(typically_trustworthy_all, support == "positive"), n)`/`r pull(filter(typically_trustworthy_all, support == "positive"), n_sum)`) and reproducible (`r pull(filter(typically_reproducible_all, support == "positive"), percentage)`%; `r pull(filter(typically_reproducible_all, support == "positive"), n)`/`r pull(filter(typically_reproducible_all, support == "positive"), n_sum)`) (Figure D2, top panel). At the same time, many agreed that a study using an ECAW would be _more_ trustworthy (`r pull(filter(ecaw_trustworthy_all, support == "positive"), percentage)`%; `r pull(filter(ecaw_trustworthy, support == "positive"), n)`/`r pull(filter(ecaw_trustworthy_all, support == "positive"), n_sum)`) and _more_ reproducible (`r pull(filter(ecaw_reproducible_all, support == "positive"), percentage)`%; `r pull(filter(ecaw_reproducible_all, support == "positive"), n)`/`r pull(filter(ecaw_reproducible_all, support == "positive"), n_sum)`) compared to a typical study using preexisting observational data (Figure 1, bottom panel).
 
-```{r typicallyEcawPlotAll, warning=FALSE, fig.cap="(ref:typicallyEcawPlotAllCaption)", fig.align="center", out.width="100%", fig.width=12.8, fig.height=6, fig.path='figs/', dev=c('png', 'pdf')}
+```{r typicallyEcawPlotAll, warning=FALSE, fig.cap="(ref:typicallyEcawPlotAllCaption)", fig.align="center", fig.pos="H", out.width="100%", fig.width=12.8, fig.height=6, fig.path='figs/', dev=c('png', 'pdf')}
 # Create typically trustworthy and reproducible plot
 # Check if there is any missing and don't understand responses separately
 # processed %>%
@@ -417,7 +436,15 @@ ecaw_plot_all <-
 typically_plot_all + ecaw_plot_all + plot_layout(ncol = 1, nrow = 2)
 ```
 
+```{=latex}
+{\smaller[1]
+\begin{singlespace}
+```
 (ref:typicallyEcawPlotAllCaption) __Figure 1D. Responses to the survey questions on trustworthiness and reproducibility of observational research with preexisting data and ECAWs.__ The survey defined trustworthy as “meaning that the results and conclusions of the publications are valid, reliable, rigorous, and accurate. That they merit trust”. The survey defined reproducible “in the sense that other researchers re-analysing the data with the same research question would produce similar results.” For each item, the number to the left of the data bar indicates the combined percentage for the responses depicted in any shade of brown/orange. The number in the center of the data bar (gray) indicates the percentage of neutral responses. The number to the right of the data bar indicates the combined percentage for the responses depicted in any shade of green. The bar charts in the top panel had no missing responses or selection of the option _“I don’t understand the question”_. The bar charts in the bottom panel excluded missing responses (n = `r pull(filter(ecaw_missing_all, item == "Trustworthy" & value == "Missing"), n)`; `r pull(filter(ecaw_missing_all, item == "Reproducible" & value == "Missing"), n)`) and responses of _“I don't understand the question”_ (n = `r pull(filter(ecaw_missing_all, item == "Trustworthy" & value == "I don't understand the question"), n)`; `r pull(filter(ecaw_missing_all, item == "Reproducible" & value == "I don't understand the question"), n)`).
+```{=latex}
+\end{singlespace}
+}
+```
 
 ```{r methodDescriptivesAll, include=FALSE}
 # Define the response level order for these variables
@@ -482,7 +509,7 @@ script_all <- level_percentage(
 
 Over half of respondents reported that their studies using preexisting observational data are preregistered never or almost never (`r filter(preregistered_all, method_preregistered == "Never or almost never") %>% pull(percentage)`%; `r filter(preregistered_all, method_preregistered == "Never or almost never") %>% pull(n)`/`r filter(preregistered_all, method_preregistered == "Never or almost never") %>% pull(n_sum)`), or sometimes (`r filter(preregistered_all, method_preregistered == "Sometimes") %>% pull(percentage)`%; `r filter(preregistered_all, method_preregistered == "Sometimes") %>% pull(n)`/`r filter(preregistered, method_preregistered == "Sometimes") %>% pull(n_sum)`) (Figure 2D). About half reported sharing their analysis scripts never or almost never (`r filter(script_all, method_script == "Never or almost never") %>% pull(percentage)`%; `r filter(script_all, method_script == "Never or almost never") %>% pull(n)`/`r filter(script_all, method_script == "Never or almost never") %>% pull(n_sum)`), or sometimes (`r filter(script_all, method_script == "Sometimes") %>% pull(percentage)`%; `r filter(script_all, method_script == "Sometimes") %>% pull(n)`/`r filter(script_all, method_script == "Sometimes") %>% pull(n_sum)`). `r filter(blind_all, method_blind == "Never or almost never") %>% pull(percentage)`% (`r filter(blind_all, method_blind == "Never or almost never") %>% pull(n)`/`r filter(blind_all, method_blind == "Never or almost never") %>% pull(n_sum)`) reported that they never or almost never blind the data analyst. Almost all respondents answered that they use both exploratory (`r pull(exploratory_all, percentage)`%; `r pull(exploratory_all, n)`/`r pull(exploratory_all, n_sum)`) and confirmatory (`r pull(confirmatory_all, percentage)`%; `r pull(confirmatory_all, n)`/`r pull(confirmatory_all, n_sum)`) analyses at least sometimes.
 
-```{r methodPlotAll, warning=FALSE, fig.cap="(ref:methodPlotAllCaption)", fig.align="center", out.width="100%", fig.width=11, fig.height=4.5, fig.path='figs/', dev=c('png', 'pdf')}
+```{r methodPlotAll, warning=FALSE, fig.cap="(ref:methodPlotAllCaption)", fig.align="center", fig.pos="H", out.width="100%", fig.width=11, fig.height=4.5, fig.path='figs/', dev=c('png', 'pdf')}
 # Used methods figures
 method_plot_data_all <-
   processed_all %>%
@@ -559,7 +586,15 @@ method_plot_data_all %>%
   )
 ```
 
+```{=latex}
+{\smaller[1]
+\begin{singlespace}
+```
 (ref:methodPlotAllCaption) __Figure 2D. Responses to survey questions about the research practices of participants.__
+```{=latex}
+\end{singlespace}
+}
+```
 
 ```{r aslpacDescriptivesAll, include=FALSE, warning=FALSE, message=FALSE}
 willing_all <- support_percentage(
@@ -629,7 +664,7 @@ prefer_all <- support_percentage(
 
 `r pull(filter(willing_all, support == "positive"), percentage)`% (`r pull(filter(willing_all, support == "positive"), n)`/`r pull(filter(willing_all, support == "positive"), n_sum)`) of respondents agreed (versus `r pull(filter(willing_all, support == "negative"), percentage)`%; `r pull(filter(willing_all, support == "negative"), n)`/`r pull(filter(willing_all, support == "negative"), n_sum)` who disagreed) that they would be less willing to use ALSPAC data if they were required to use an ECAW (Figure 3D). `r pull(filter(opt_all, support == "positive"), percentage)`% (`r pull(filter(opt_all, support == "positive"), n)`/`r pull(filter(opt_all, support == "positive"), n_sum)`) agreed (`r pull(filter(opt_all, support == "negative"), percentage)`%; `r pull(filter(opt_all, support == "negative"), n)`/`r pull(filter(opt_all, support == "negative"), n_sum)` disagreed) that they would opt-in if ALSPAC ran a study on ECAWs. `r pull(filter(study_all, support == "positive"), percentage)`% (`r pull(filter(study_all, support == "positive"), n)`/`r pull(filter(study_all, support == "positive"), n_sum)`) agreed (`r pull(filter(study_all, support == "negative"), percentage)`%; `r pull(filter(study_all, support == "negative"), n)`/`r pull(filter(study_all, support == "negative"), n_sum)` disagreed) that ALSPAC should run a study on ECAWs. `r pull(filter(prefer_all, support == "positive"), percentage)`% (`r pull(filter(prefer_all, support == "positive"), n)`/`r pull(filter(prefer_all, support == "positive"), n_sum)`) agreed (`r pull(filter(prefer, support == "negative"), percentage)`%; `r pull(filter(prefer_all, support == "negative"), n)`/`r pull(filter(prefer_all, support == "negative"), n_sum)` disagreed) that they would prefer using an ECAW than using typical preregistration.
 
-```{r alspacPlotAll, warning=FALSE, message=FALSE, fig.cap="(ref:alspacPlotAllCaption)", fig.align="center", out.width="100%", fig.width=14, fig.height=5, fig.path='figs/', dev=c('png', 'pdf')}
+```{r alspacPlotAll, warning=FALSE, message=FALSE, fig.cap="(ref:alspacPlotAllCaption)", fig.align="center", fig.pos="H", out.width="100%", fig.width=14, fig.height=5, fig.path='figs/', dev=c('png', 'pdf')}
 # Check if there is any missing and don't understand responses separately
 alspac_missing_all <-
   processed_all %>%
@@ -718,7 +753,15 @@ plot(alspac_plot_likert_data_all, digits = 1, text.size = 6) +
   )
 ```
 
+```{=latex}
+{\smaller[1]
+\begin{singlespace}
+```
 (ref:alspacPlotAllCaption) __Figure 3D. Responses to survey questions about using ECAWs.__ These bar charts exclude missing values (_n_ = `r pull(filter(alspac_missing_all, item == "Less_willing" & value == "Missing"), n)`; `r pull(filter(alspac_missing_all, item == "Opt_in" & value == "Missing"), n)`; `r pull(filter(alspac_missing_all, item == "Study" & value == "Missing"), n)`; `r pull(filter(alspac_missing_all, item == "Prefer_ecaw" & value == "Missing"), n)`; respectively from top to bottom), responses of _"I don't understand the question"_ (_n_ = `r pull(filter(alspac_missing_all, item == "Less_willing" & value == "I don't understand the question"), n)`; `r pull(filter(alspac_missing_all, item == "Opt_in" & value == "I don't understand the question"), n)`; `r pull(filter(alspac_missing_all, item == "Study" & value == "I don't understand the question"), n)`; `r pull(filter(alspac_missing_all, item == "Prefer_ecaw" & value == "I don't understand the question"), n)`), and responses of _"Unsure"_ (_n_ = `r pull(filter(alspac_missing_all, item == "Less_willing" & value == "Unsure"), n)`; `r pull(filter(alspac_missing_all, item == "Opt_in" & value == "Unsure"), n)`; `r pull(filter(alspac_missing_all, item == "Study" & value == "Unsure"), n)`; `r pull(filter(alspac_missing_all, item == "Prefer_ecaw" & value == "Unsure"), n)`). Agreement with the first question may be slightly inflated due to the format of the questions in this block. Respondents with a highly positive inclination towards ECAWs would be expected to disagree with the first question, but agree with the next three questions. Four respondents agreed with all four statements, suggesting they may have glazed over the word “less” in the first question \protect\footnotemark[2]. Interpreting responses to the second and third question come with a degree of ambiguity as the survey did not specify what was meant by the term “study” \protect\footnotemark[3].
+```{=latex}
+\end{singlespace}
+}
+```
 
 \protect\footnotetext[2]{Another four respondents agreed with at least the first and second question, which appear contradictory. We did not preregister these considerations. More careful wording of these questions could have circumvented the ambiguity in interpreting these seemingly contradictory responses.}
 \protect\footnotetext[3]{We intended for these questions to ask about ALSPAC running a trial on ECAWs. However, due to the ambiguity around the terms “study”, some respondents may have interpreted this as a survey, focus group, feasibility, or pilot type of study.}
